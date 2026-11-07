@@ -459,6 +459,12 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server Node.js berjalan & terhubung ke Dual Supabase di port ${PORT}!`);
-});
+// Hapus atau ganti bagian app.listen paling bawah dengan ini:
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server berjalan di port ${PORT}`);
+    });
+}
+
+// Ekspor app untuk Vercel Serverless
+module.exports = app;
