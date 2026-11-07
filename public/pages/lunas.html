@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Lunas - IpuzPita MAKE UP</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f6f9; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen w-full overflow-x-hidden text-slate-800 bg-[#f4f6f9]">
+
+    <!-- 1. SIDEBAR DESKTOP & MOBILE DRAWER (Garis Tiga / Hamburger Menu) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden md:hidden transition-opacity opacity-0" onclick="toggleMobileSidebar()"></div>
+
+    <aside id="sidebarMenu" class="fixed md:static inset-y-0 left-0 w-20 bg-white border-r border-slate-100 flex flex-col items-center py-6 justify-between shrink-0 shadow-sm z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="hidden md:flex w-12 h-12 bg-red-50/50 rounded-2xl items-center justify-center p-2 shadow-inner border border-red-100">
+            <img src="../assets/logo ipuzpita kotak.ico" alt="Logo IpuzPita" class="w-full h-full object-contain" onerror="this.src='../assets/images/logo_ipuzpita.png'">
+        </div>
+
+        <div class="flex flex-col gap-6 items-center">
+            <!-- Tombol Tutup Sidebar Khusus Mobile -->
+            <button onclick="toggleMobileSidebar()" class="md:hidden w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-bold mb-2">✕</button>
+
+            <a href="dashboard.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Dashboard">📊</a>
+            <a href="buat_nota.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Buat Nota">📝</a>
+            <a href="riwayat.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Riwayat Pesanan">📜</a>
+            <a href="keuangan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Keuangan">💰</a>
+        </div>
+
+        <div class="flex flex-col gap-4 items-center">
+            <a href="pengaturan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Pengaturan">⚙️</a>
+            <a href="login.html" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
+        </div>
+    </aside>
+
+    <!-- 2. KONTEN UTAMA -->
+    <main class="flex-1 flex flex-col min-h-screen w-full overflow-y-auto custom-scrollbar">
+        
+        <!-- Top Bar Header (Warna Hijau Khusus Lunas) -->
+        <header class="h-16 md:h-20 bg-emerald-700 text-white px-3 md:px-8 flex items-center justify-between shrink-0 gap-3 sticky top-0 z-20 shadow-md">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+                <button onclick="toggleMobileSidebar()" class="md:hidden w-9 h-9 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl flex items-center justify-center font-bold text-base transition shadow-sm shrink-0" title="Menu Navigasi">
+                    ☰
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center p-1.5">
+                        <img src="../assets/images/logo_ipuzpita.png" alt="Logo" class="w-full h-full object-contain filter brightness-0 invert" onerror="this.style.display='none'">
+                    </div>
+                    <div>
+                        <h1 class="text-sm md:text-xl font-bold tracking-tight">DAFTAR PEMBAYARAN LUNAS 🟢</h1>
+                        <p class="hidden md:block text-xs text-emerald-100">Riwayat seluruh transaksi pesanan makeup yang sudah lunas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-emerald-800/60 px-3 py-1.5 rounded-2xl border border-emerald-600/50 shadow-sm shrink-0 text-xs">
+                <span>📅 <span id="current-date-badge">Memuat...</span></span>
+            </div>
+        </header>
+
+        <!-- Main Body Container -->
+        <div class="p-4 md:p-8 flex flex-col gap-6 pb-20">
+            
+            <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-2">
+                <h3 class="text-sm md:text-base font-bold text-slate-800">Daftar Uang Masuk Lunas</h3>
+                <p class="text-xs text-slate-400">Berikut adalah daftar lengkap klien yang status pembayarannya sudah lunas sepenuhnya.</p>
+            </div>
+
+            <!-- List Data Lunas -->
+            <div id="containerLunas" class="flex flex-col gap-4">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center text-slate-400 text-xs">
+                    Memuat data pembayaran lunas dari database...
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Script Interaksi & Flask API -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const todayStr = new Date().toLocaleDateString('id-ID', options);
+            const dateBadge = document.getElementById('current-date-badge');
+            if (dateBadge) dateBadge.innerText = todayStr;
+
+            muatDataLunas();
+        });
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        async function muatDataLunas() {
+            try {
+                let response = await fetch('/api/semua_riwayat');
+                let res = await response.json();
+
+                if (res.status === 'success') {
+                    let dataLunas = (res.data || []).filter(item => item.status === 'Lunas');
+                    renderListLunas(dataLunas);
+                }
+            } catch (err) {
+                console.log("Gagal memuat data lunas:", err);
+            }
+        }
+
+        function renderListLunas(list) {
+            const container = document.getElementById('containerLunas');
+            if (!container) return;
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm text-center text-slate-400 text-xs">
+                        Belum ada transaksi dengan status Lunas.
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(item => `
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:shadow-md transition">
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">${item.no_inv}</span>
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">Lunas</span>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800 mt-1">${item.nama}</h4>
+                        <p class="text-xs text-slate-500">📅 Tanggal Acara: ${item.tanggal || '-'}</p>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                        <div class="text-left sm:text-right">
+                            <span class="text-[10px] text-slate-400 block">Total Diterima</span>
+                            <strong class="text-emerald-600 font-extrabold text-base">Rp ${item.total.toLocaleString('id-ID')}</strong>
+                        </div>
+                        <button onclick="bukaNota('${item.no_inv}')" class="px-4 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-xl font-semibold text-xs transition">🖨️ Nota</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function bukaNota(invoiceNo) {
+            try {
+                let response = await fetch(`/api/detail_transaksi/${invoiceNo}`);
+                let res = await response.json();
+                if (res.success) {
+                    let trx = res.transaksi;
+                    let dataNota = {
+                        no_inv: trx.invoice_no,
+                        nama: trx.nama_klien,
+                        hp: trx.no_wa || "-",
+                        tanggal: trx.tanggal_acara,
+                        lokasi: trx.lokasi_venue || "-",
+                        status: trx.status,
+                        dp: trx.nominal_dp || 0,
+                        total: res.items.reduce((sum, i) => sum + (i.subtotal || (i.harga * i.qty)), 0),
+                        sisa: 0,
+                        items: res.items
+                    };
+                    localStorage.setItem('previewDataNota', JSON.stringify(dataNota));
+                    window.open('nota_template.html', '_blank');
+                }
+            } catch (e) {
+                alert("Gagal membuka detail nota.");
+            }
+        }
+    </script>
+</body>
+</html>

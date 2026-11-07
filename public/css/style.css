@@ -1,0 +1,1236 @@
+/* ==========================================
+   1. FONT & BASE STYLES
+   ========================================== */
+@font-face {
+    font-family: 'Poppins';
+    src: url('../../assets/fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: 400;
+}
+@font-face {
+    font-family: 'Poppins';
+    src: url('../../assets/fonts/Poppins-Medium.ttf') format('truetype');
+    font-weight: 500;
+}
+@font-face {
+    font-family: 'Poppins';
+    src: url('../../assets/fonts/Poppins-Bold.ttf') format('truetype');
+    font-weight: 700;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f1f1f1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow-y: auto !important;
+}
+
+body.dashboard-body {
+    margin: 0 !important;
+    padding: 0 0 40px 0 !important;
+    background-color: #f4f6f9 !important;
+    min-height: 100vh;
+    width: 100%;
+    display: block !important;
+    overflow-y: auto !important;
+}
+
+/* ==========================================
+   2. HALAMAN LOGIN & SLIDING SIGN UP
+   ========================================== */
+.login-card {
+    position: relative;
+    width: 960px;
+    height: 540px;
+    background: #ffffff;
+    border-radius: 20px;
+    display: flex;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.form-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 5;
+}
+
+.brand-logo {
+    max-width: 160px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.form-title {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.input-box {
+    width: 80%;
+    max-width: 280px;
+    margin-bottom: 12px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 10px 18px;
+    background-color: #E2E2E2;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-box input:focus {
+    background-color: #ffffff;
+    border: 1.5px solid #E10600;
+    box-shadow: 0 0 8px rgba(225, 6, 0, 0.2);
+}
+
+.password-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-box input {
+    padding-right: 40px !important;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.toggle-password:hover {
+    opacity: 1;
+}
+
+.forgot-link {
+    color: #333;
+    font-size: 12px;
+    text-decoration: none;
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+.btn-signin {
+    width: 140px;
+    padding: 9px;
+    background-color: #E10600;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(225, 6, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-signin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(225, 6, 0, 0.4);
+    background-color: #cc0500;
+}
+
+.banner-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-color: #E10600;
+    border-top-left-radius: 180px;
+    border-bottom-left-radius: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 80px;
+    padding-left: 55px;
+    color: #ffffff;
+    overflow: hidden;
+    z-index: 2;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.banner-heading {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    text-align: left;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.illustration-img {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 480px;
+    height: auto;
+    z-index: 1;
+    pointer-events: none;
+    animation: floatIllustration 4s ease-in-out infinite;
+}
+
+.form-signup-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 1;
+}
+
+.img-signup {
+    display: none;
+}
+
+.login-card.active-signup .form-left {
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.login-card.active-signup .banner-right {
+    transform: translateX(-100%);
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 180px;
+    border-bottom-right-radius: 180px;
+    padding-top: 40px !important;
+    z-index: 10;
+}
+
+.login-card.active-signup .form-signup-container {
+    opacity: 1;
+    pointer-events: all;
+    z-index: 5;
+}
+
+.login-card.active-signup .img-signin {
+    display: none;
+}
+
+.login-card.active-signup .img-signup {
+    display: block;
+    bottom: -45px !important;
+    right: 35px !important;
+    width: 440px !important;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatIllustration {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+/* Perbaikan Teks Banner saat Sign Up Aktif */
+.login-card.active-signup .banner-right .img-signup {
+    display: block !important;
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.login-card.active-signup .banner-right .img-signin {
+    display: none !important;
+}
+
+/* ==========================================
+   3. HALAMAN DASHBOARD & NAVBAR
+   ========================================== */
+.top-navbar {
+    width: 100% !important;
+    height: 60px;
+    background-color: #E10600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.btn-menu-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 5px;
+}
+
+.btn-menu-toggle span {
+    width: 24px;
+    height: 3px;
+    background-color: #ffffff;
+    border-radius: 2px;
+}
+
+.top-menu {
+    display: flex;
+    gap: 30px;
+}
+
+.top-menu-center {
+    display: flex;
+    gap: 35px;
+    margin: 0 auto;
+}
+
+.top-menu a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding-bottom: 4px;
+    transition: opacity 0.2s ease;
+}
+
+.top-menu a:hover {
+    opacity: 0.85;
+}
+
+.top-menu a.active {
+    font-weight: 700;
+    border-bottom: 3px solid #ffffff;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 99;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.sidebar-drawer {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background-color: #000000;
+    color: #ffffff;
+    z-index: 100;
+    transition: all 0.3s ease-in-out;
+    padding: 30px 20px;
+}
+
+.sidebar-drawer.active {
+    left: 0;
+}
+
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #333333;
+    margin-bottom: 20px;
+}
+
+.avatar-box {
+    width: 45px !important;
+    height: 45px !important;
+    min-width: 45px !important;
+    min-height: 45px !important;
+    background-color: #E10600;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sidebar-menu a {
+    color: #cccccc;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.sidebar-menu a.active {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #333333;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.profile-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-role {
+    font-size: 11px;
+    color: #888888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dashboard-content {
+    width: 95% !important;
+    max-width: 1600px !important;
+    margin: 25px auto !important;
+    padding: 0 15px !important;
+    box-sizing: border-box;
+}
+
+.dashboard-header-brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.title-section h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+}
+
+.title-section p {
+    font-size: 13px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.dashboard-logo {
+    height: 50px;
+}
+
+.date-badge {
+    background: #ffffff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 20px !important;
+    margin-bottom: 25px !important;
+    width: 100% !important;
+}
+
+.stat-card {
+    background: #ffffff;
+    padding: 24px 20px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.stat-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 34px;
+    font-weight: 700;
+    color: #000;
+}
+
+.unit-text {
+    font-size: 15px;
+    font-weight: 400;
+    color: #777;
+}
+
+.stat-value-money {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111;
+}
+
+.main-grid {
+    display: grid !important;
+    grid-template-columns: 320px 1fr !important;
+    gap: 20px !important;
+    width: 100% !important;
+}
+
+.status-summary-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.status-card {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-radius: 16px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.status-info {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-info h3 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 4px 0 2px 0;
+}
+
+.status-info p {
+    font-size: 12px;
+    margin: 0;
+    opacity: 0.85;
+}
+
+.card-lunas { background-color: #E8F6ED; color: #1E7E34; }
+.card-dp { background-color: #EBF3FF; color: #1B55B8; }
+.card-menunggu { background-color: #FFF8E6; color: #B27B00; }
+
+.dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+.dot.green { background-color: #28A745; }
+.dot.blue { background-color: #0056B3; }
+.dot.yellow { background-color: #FFC107; }
+
+.arrow-box {
+    width: 48px;
+    height: 70px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.arrow-lunas { background-color: #D1EBD9; color: #1E7E34; }
+.arrow-dp { background-color: #D2E3FC; color: #1B55B8; }
+.arrow-menunggu { background-color: #F7E9C4; color: #B27B00; }
+
+.activity-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.activity-card {
+    background-color: #ffffff !important;
+    padding: 22px 28px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+.activity-card h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: #111;
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.activity-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 12px;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.activity-list li:hover {
+    background-color: #f8fafc;
+}
+
+.dot-item.red {
+    width: 9px;
+    height: 9px;
+    background-color: #E10600;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.activity-text {
+    flex: 1;
+    margin-left: 15px;
+    color: #333;
+}
+
+.badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-lunas { background-color: #D1F2D9; color: #1E7E34; }
+.badge-dp { background-color: #D0E1FD; color: #1B55B8; }
+.badge-menunggu { background-color: #FFECA1; color: #B27B00; }
+
+.income-banner-card-small {
+    background-color: #ffffff !important;
+    padding: 16px 20px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.income-banner-card-small .income-info span {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.income-banner-card-small .income-info h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #000;
+    margin-top: 2px;
+}
+
+.income-banner-card {
+    background-color: #ffffff !important;
+    padding: 22px 28px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+}
+
+.income-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.income-info span {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+}
+
+.income-info h3 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #000;
+    margin-top: 4px;
+}
+
+.progress-pill {
+    background-color: #E8F8EE;
+    color: #28A745;
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: #E8F8EE;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: #28A745;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+/* Modal Edit Status */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-card {
+    background: #ffffff;
+    width: 420px;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-card {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.btn-close-modal {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+}
+
+.modal-subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #E10600;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+}
+
+.input-select, .input-text {
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-secondary {
+    background: #eee;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary-red {
+    background: #E10600;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ==========================================
+   4. HALAMAN BUAT NOTA
+   ========================================== */
+.nota-form-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 25px !important;
+    width: 100% !important;
+    margin-top: 10px;
+}
+
+.nota-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.summary-box {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 15px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.action-buttons-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.btn-secondary-nota {
+    flex: 1;
+    padding: 12px;
+    background: #e5e7eb;
+    color: #374151;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-secondary-nota:hover {
+    background: #d1d5db;
+}
+
+.btn-primary-nota {
+    flex: 2;
+    padding: 12px;
+    background: #E10600;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(225, 6, 0, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-primary-nota:hover {
+    background: #cc0500;
+    transform: translateY(-2px);
+}
+
+.btn-preview-nota {
+    flex: 1.5;
+    padding: 12px;
+    background: #1B55B8;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(27, 85, 184, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-preview-nota:hover {
+    background: #154596;
+    transform: translateY(-2px);
+}
+
+.items-section {
+    background-color: #fafafa;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.item-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.item-row .item-nama {
+    flex: 2;
+}
+
+.item-row .item-harga {
+    flex: 1.2;
+}
+
+.btn-del-item {
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    width: 36px;
+    height: 38px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-del-item:hover {
+    background: #fca5a5;
+    color: #991b1b;
+}
+
+.btn-add-item {
+    width: 100%;
+    padding: 9px;
+    background: #e0e7ff;
+    color: #3730a3;
+    border: 1px dashed #6366f1;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-add-item:hover {
+    background: #c7d2fe;
+}
+
+/* ==========================================
+   5. HALAMAN PENGATURAN & LAINNYA
+   ========================================== */
+.settings-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 25px !important;
+    width: 100% !important;
+    margin-top: 10px;
+}
+
+.settings-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.badge-status {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.status-lunas { background-color: #E8F6ED; color: #1E7E34; }
+.status-dp { background-color: #EBF3FF; color: #1B55B8; }
+.status-menunggu { background-color: #FFF8E6; color: #B27B00; }
+
+/* ==========================================
+   6. HALAMAN STATUS TRANSAKSI KHUSUS
+   ========================================== */
+.top-navbar-status {
+    width: 100%;
+    height: 65px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.navbar-dp { background-color: #1B55B8; }
+.navbar-lunas { background-color: #1E7E34; }
+.navbar-menunggu { background-color: #B27B00; }
+
+.btn-back {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: opacity 0.2s ease;
+}
+.btn-back:hover { opacity: 0.8; }
+
+.header-status-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.header-status-title h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+/* INI KUNCI UNTUK MENGECILKAN LOGO RAKSASA */
+.status-logo {
+    height: 40px; 
+    width: auto;
+}
+
+.date-badge-status span {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.page-section-header { margin-bottom: 25px; }
+.page-section-header h3 { font-size: 22px; color: #111; margin-bottom: 4px; }
+.page-section-header p { font-size: 13px; color: #666; margin: 0; }
+
+.date-group { margin-bottom: 25px; }
+.date-header {
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #555;
+    font-size: 14px;
+    border-bottom: 1.5px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.transaction-item {
+    background: #ffffff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+    border-left: 5px solid #1B55B8; /* Warna penanda DP */
+}
+
+.tx-info { display: flex; flex-direction: column; gap: 4px; }
+.tx-inv { font-size: 13px; font-weight: 700; color: #E10600; }
+.tx-name { font-size: 15px; font-weight: 600; color: #222; }
+
+.tx-nominal {
+    font-weight: 700;
+    font-size: 18px;
+}
+.text-primary { color: #1B55B8; }
+
+/* ==========================================
+   LAPORAN KEUANGAN (BULANAN)
+   ========================================== */
+.finance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.finance-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.finance-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+/* ==========================================
+   TAB SWITCHER & RINCIAN KEUANGAN
+   ========================================== */
+.tab-container {
+    margin-top: 30px;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.tab-header {
+    display: flex;
+    gap: 15px;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+.tab-btn {
+    background: none;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: #777;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+.tab-btn:hover {
+    background: #f8f9fa;
+}
+.tab-btn.active {
+    background: #f1f3f4;
+    color: #111;
+}
+.tab-btn.tab-income.active { color: #1a73e8; background: #e8f0fe; }
+.tab-btn.tab-expense.active { color: #d93025; background: #fce8e6; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ==========================================
+   DESAIN TABEL RIWAYAT & KEUANGAN
+   ========================================== */
+.table-container {
+    overflow-x: auto;
+    margin-top: 15px;
+}
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+.history-table th {
+    background-color: #f8f9fa;
+    color: #555;
+    font-size: 13px;
+    padding: 12px 15px;
+    border-bottom: 2px solid #eee;
+}
+.history-table td {
+    padding: 12px 15px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}

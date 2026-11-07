@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Keuangan - IpuzPita MAKE UP</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f6f9; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row h-screen overflow-hidden text-slate-800">
+
+    <!-- 1. SIDEBAR DESKTOP & MOBILE DRAWER (Garis Tiga / Hamburger Menu) -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden md:hidden transition-opacity opacity-0" onclick="toggleMobileSidebar()"></div>
+
+    <aside id="sidebarMenu" class="fixed md:static inset-y-0 left-0 w-20 bg-white border-r border-slate-100 flex flex-col items-center py-6 justify-between shrink-0 shadow-sm z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="hidden md:flex w-12 h-12 bg-red-50/50 rounded-2xl items-center justify-center p-2 shadow-inner border border-red-100">
+            <img src="../assets/logo ipuzpita kotak.ico" alt="Logo IpuzPita" class="w-full h-full object-contain" onerror="this.src='../assets/images/logo_ipuzpita.png'">
+        </div>
+
+        <div class="flex flex-col gap-6 items-center">
+            <!-- Tombol Tutup Sidebar Khusus Mobile -->
+            <button onclick="toggleMobileSidebar()" class="md:hidden w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-bold mb-2">✕</button>
+
+            <a href="dashboard.html" class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Dashboard">📊</a>
+            <a href="buat_nota.html" class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Buat Nota">📝</a>
+            <a href="riwayat.html" class="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Riwayat Pesanan">📜</a>
+            <a href="keuangan.html" class="w-12 h-12 bg-red-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-red-200 transition transform hover:scale-105" title="Keuangan">💰</a>
+        </div>
+
+        <div class="flex flex-col gap-4 items-center">
+            <a href="pengaturan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Pengaturan">⚙️</a>
+            <a href="login.html" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
+        </div>
+    </aside>
+
+    <!-- 2. KONTEN UTAMA -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- Top Bar Header -->
+        <header class="h-16 md:h-20 bg-white border-b border-slate-100 px-3 md:px-8 flex items-center justify-between shrink-0 gap-3">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+                <!-- Tombol Garis Tiga (Hamburger Menu) -->
+                <button onclick="toggleMobileSidebar()" class="md:hidden w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl flex items-center justify-center font-bold text-base transition shadow-sm shrink-0" title="Menu Navigasi">
+                    ☰
+                </button>
+                <div class="overflow-hidden">
+                    <h1 class="text-xs sm:text-sm md:text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap overflow-x-auto custom-scrollbar pb-0.5" id="welcome-title">
+                        Laporan Keuangan Bulanan 💰
+                    </h1>
+                    <p class="hidden md:block text-xs text-slate-400" id="current-date-badge">Memuat tanggal...</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-2xl border border-slate-100 shadow-sm shrink-0">
+                <div class="w-7 h-7 md:w-9 md:h-9 bg-gradient-to-tr from-red-600 to-rose-400 text-white rounded-xl flex items-center justify-center font-bold text-xs md:text-sm shadow" id="profileInitial">
+                    YH
+                </div>
+                <div class="text-left hidden sm:block">
+                    <h4 class="text-xs font-bold text-slate-800" id="profileName">Owner</h4>
+                    <p class="text-[10px] text-slate-400" id="profileRole">Akun Aktif</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body Scrollable -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 flex flex-col gap-6 md:gap-8">
+            
+            <!-- SECTION 1: KPI / Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+                <!-- Card 1: Total Revenue -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 md:p-6 rounded-3xl border border-blue-100 shadow-sm flex flex-col justify-between transform transition duration-300 hover:scale-[1.02]">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-bold text-blue-700 uppercase tracking-wider">Total Pemasukan (YTD)</span>
+                        <div class="w-9 h-9 md:w-10 md:h-10 bg-blue-500 text-white rounded-2xl flex items-center justify-center shadow-md shadow-blue-200">📈</div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-extrabold text-blue-900" id="kpiTotalMasuk">Rp 0</h2>
+                        <p class="text-[11px] text-blue-600 mt-1 font-medium">Akumulasi pendapatan nota aktif</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Total Expenses -->
+                <div class="bg-gradient-to-br from-rose-50 to-red-50 p-5 md:p-6 rounded-3xl border border-rose-100 shadow-sm flex flex-col justify-between transform transition duration-300 hover:scale-[1.02]">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-bold text-rose-700 uppercase tracking-wider">Total Pengeluaran (YTD)</span>
+                        <div class="w-9 h-9 md:w-10 md:h-10 bg-rose-500 text-white rounded-2xl flex items-center justify-center shadow-md shadow-rose-200">📉</div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-extrabold text-rose-900" id="kpiTotalKeluar">Rp 0</h2>
+                        <p class="text-[11px] text-rose-600 mt-1 font-medium">Biaya operasional & bahan kosmetik</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Net Profit -->
+                <div class="bg-gradient-to-br from-emerald-50 to-teal-50 p-5 md:p-6 rounded-3xl border border-emerald-100 shadow-sm flex flex-col justify-between transform transition duration-300 hover:scale-[1.02]">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Akumulasi Laba Bersih</span>
+                        <div class="w-9 h-9 md:w-10 md:h-10 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-md shadow-emerald-200">💰</div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-extrabold text-emerald-900" id="kpiTotalLaba">Rp 0</h2>
+                        <p class="text-[11px] text-emerald-600 mt-1 font-medium">Profit bersih siap alokasi</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Action Bar -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <span class="text-xs font-semibold text-slate-500">Filter Tahun:</span>
+                    <select id="filterTahun" onchange="muatDataKeuangan()" class="bg-slate-50 text-xs px-4 py-2.5 rounded-xl border border-slate-200 font-medium focus:outline-none focus:border-red-500 w-full sm:w-auto">
+                        <option value="2026">Tahun 2026</option>
+                        <option value="2025">Tahun 2025</option>
+                    </select>
+                </div>
+                
+                <button onclick="bukaModal()" class="w-full sm:w-auto px-5 py-3 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-2xl shadow-lg shadow-red-200 transition transform hover:scale-105 flex items-center justify-center gap-2">
+                    <span>+ Catat Pengeluaran Baru</span>
+                </button>
+            </div>
+
+            <!-- SECTION 3: Monthly Financial Grid Cards -->
+            <div id="containerKeuanganBulanan" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <div class="p-6 bg-white rounded-3xl border border-slate-100 col-span-3 text-center text-slate-400 text-xs animate-pulse">
+                    Memuat data keuangan dari database...
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal Catat Pengeluaran -->
+    <div id="modalPengeluaran" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col gap-6 transform transition-all">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                <h3 class="text-base md:text-lg font-bold text-slate-900">Catat Pengeluaran Baru 💸</h3>
+                <button onclick="tutupModal()" class="w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center font-bold hover:bg-slate-200">✕</button>
+            </div>
+            
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 mb-1 block">Tanggal Pengeluaran</label>
+                    <input type="date" id="inputTglKeluar" class="w-full bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 mb-1 block">Kategori</label>
+                    <select id="inputKategori" class="w-full bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500">
+                        <option value="Operasional Studio">Operasional Studio</option>
+                        <option value="Belanja Alat & Kosmetik">Belanja Alat & Kosmetik</option>
+                        <option value="Transportasi">Transportasi / Gas</option>
+                        <option value="Lain-lain">Lain-lain</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 mb-1 block">Keterangan / Keperluan</label>
+                    <input type="text" id="inputKet" class="w-full bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500" placeholder="Contoh: Beli foundation & bedak baru">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-600 mb-1 block">Nominal (Rp)</label>
+                    <input type="number" id="inputNominal" class="w-full bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500" placeholder="Contoh: 350000">
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-100">
+                <button onclick="tutupModal()" class="w-full sm:w-auto px-5 py-3 bg-slate-100 text-slate-600 text-xs font-semibold rounded-2xl hover:bg-slate-200">Batal</button>
+                <button onclick="simpanPengeluaranDB()" class="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-2xl shadow-md shadow-red-200">Simpan Pengeluaran</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Terpadu (Drawer Toggle & Flask Fetch API) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const todayStr = new Date().toLocaleDateString('id-ID', options);
+            const dateBadge = document.getElementById('current-date-badge');
+            if (dateBadge) dateBadge.innerText = `📅 ${todayStr}`;
+
+            const todayISO = new Date().toISOString().split('T')[0];
+            const tglInput = document.getElementById('inputTglKeluar');
+            if (tglInput) tglInput.value = todayISO;
+
+            muatProfilUser();
+            muatDataKeuangan();
+        });
+
+        // Fungsi Buka-Tutup Sidebar Mobile (Garis Tiga)
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        async function muatProfilUser() {
+            try {
+                let response = await fetch('/api/user_profile');
+                let res = await response.json();
+                if (res && res.status === 'success') {
+                    document.getElementById('profileName').innerText = res.nama || 'Ravi Hendrawan';
+                    document.getElementById('profileRole').innerText = res.email || 'aditiyaravi218@gmail.com';
+                    let initials = (res.nama || 'Ravi').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                    document.getElementById('profileInitial').innerText = initials;
+                }
+            } catch (e) {
+                console.log("Gagal memuat profil:", e);
+            }
+        }
+
+        async function muatDataKeuangan() {
+            try {
+                let response = await fetch('/api/rekap_keuangan');
+                let res = await response.json();
+
+                if (res && res.status === 'success') {
+                    let dataBulan = res.data || [];
+                    
+                    let totalMasukYTD = dataBulan.reduce((sum, item) => sum + item.total_pemasukan, 0);
+                    let totalKeluarYTD = dataBulan.reduce((sum, item) => sum + item.total_pengeluaran, 0);
+                    let labaYTD = totalMasukYTD - totalKeluarYTD;
+
+                    document.getElementById('kpiTotalMasuk').innerText = formatRupiah(totalMasukYTD);
+                    document.getElementById('kpiTotalKeluar').innerText = formatRupiah(totalKeluarYTD);
+                    document.getElementById('kpiTotalLaba').innerText = formatRupiah(labaYTD);
+
+                    let formattedGrid = dataBulan.map((item, index) => ({
+                        bulan: item.kode_bulan,
+                        nama_bulan: item.nama_bulan,
+                        pemasukan: item.total_pemasukan,
+                        pengeluaran: item.total_pengeluaran,
+                        laba: item.laba_bersih,
+                        status: index === 0 ? 'Bulan Ini' : 'Arsip'
+                    }));
+
+                    renderGridBulanan(formattedGrid);
+                }
+            } catch (err) {
+                console.log("Gagal memuat rekap keuangan dari Flask:", err);
+            }
+        }
+
+        function renderGridBulanan(dataBulan) {
+            const container = document.getElementById('containerKeuanganBulanan');
+            if (!container) return;
+
+            if (dataBulan.length === 0) {
+                container.innerHTML = `<div class="p-6 bg-white rounded-3xl border border-slate-100 col-span-3 text-center text-slate-400 text-xs">Belum ada data keuangan tercatat.</div>`;
+                return;
+            }
+
+            container.innerHTML = dataBulan.map(item => {
+                let isBulanIni = item.status === 'Bulan Ini';
+                let borderColor = isBulanIni ? 'border-t-8 border-t-red-600' : 'border-t-8 border-t-slate-300';
+                let badgeClass = isBulanIni ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600';
+                let btnClass = isBulanIni ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-700';
+
+                return `
+                    <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-md ${borderColor} flex flex-col justify-between transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
+                        <div class="flex flex-col gap-6">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg md:text-xl font-extrabold text-slate-900">${item.nama_bulan}</h3>
+                                <span class="${badgeClass} px-4 py-1.5 rounded-full text-xs font-bold">${item.status}</span>
+                            </div>
+                            <div class="text-xs md:text-sm text-slate-600 flex flex-col gap-4 bg-slate-50/80 p-4 md:p-5 rounded-2xl border border-slate-100">
+                                <div class="flex justify-between items-center"><span>Total Pemasukan:</span> <strong class="text-blue-600 font-bold text-sm md:text-base">${formatRupiah(item.pemasukan)}</strong></div>
+                                <div class="flex justify-between items-center"><span>Total Pengeluaran:</span> <strong class="text-rose-600 font-bold text-sm md:text-base">${formatRupiah(item.pengeluaran)}</strong></div>
+                                <hr class="border-slate-200 my-1">
+                                <div class="flex justify-between items-center text-sm md:text-base"><span>Laba Bersih:</span> <strong class="text-emerald-600 font-extrabold text-base md:text-lg">${formatRupiah(item.laba)}</strong></div>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='detail_bulan.html?bulan=${item.bulan}'" class="${btnClass} mt-8 py-4 px-6 rounded-2xl text-sm font-bold transition flex items-center justify-center gap-3">
+                            <span>Buka Detail Laporan</span>
+                            <span class="text-lg">→</span>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        }
+
+        function bukaModal() {
+            const modal = document.getElementById('modalPengeluaran');
+            if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+        }
+
+        function tutupModal() {
+            const modal = document.getElementById('modalPengeluaran');
+            if (modal) { modal.classList.remove('flex'); modal.classList.add('hidden'); }
+        }
+
+        async function simpanPengeluaranDB() {
+            let tgl = document.getElementById('inputTglKeluar').value;
+            let kat = document.getElementById('inputKategori').value;
+            let ket = document.getElementById('inputKet').value.trim();
+            let nominal = parseFloat(document.getElementById('inputNominal').value) || 0;
+
+            if (!ket || nominal <= 0) {
+                alert('⚠️ Harap isi keterangan dan nominal pengeluaran dengan benar!');
+                return;
+            }
+
+            try {
+                let response = await fetch('/api/simpan_pengeluaran', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tanggal: tgl, kategori: kat, keterangan: ket, nominal: nominal })
+                });
+                let res = await response.json();
+
+                if (res && res.status === 'success') {
+                    alert('✅ Pengeluaran berhasil disimpan ke database!');
+                    tutupModal();
+                    muatDataKeuangan();
+                } else {
+                    alert('❌ Gagal menyimpan pengeluaran: ' + (res.message || ''));
+                }
+            } catch (e) {
+                alert('Kesalahan jaringan saat menyimpan pengeluaran.');
+            }
+        }
+    </script>
+</body>
+</html>

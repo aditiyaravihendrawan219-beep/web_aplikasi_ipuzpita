@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - IpuzPita MAKE UP</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f6f9; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeInUp 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row h-screen overflow-hidden text-slate-800">
+
+    <!-- 1. SIDEBAR DESKTOP & MOBILE DRAWER (Garis Tiga / Hamburger Menu) -->
+    <!-- Overlay Backdrop untuk Mobile -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden md:hidden transition-opacity opacity-0" onclick="toggleMobileSidebar()"></div>
+
+    <aside id="sidebarMenu" class="fixed md:static inset-y-0 left-0 w-20 bg-white border-r border-slate-100 flex flex-col items-center py-6 justify-between shrink-0 shadow-sm z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="hidden md:flex w-12 h-12 bg-red-50/50 rounded-2xl items-center justify-center p-2 shadow-inner border border-red-100">
+            <img src="../assets/logo ipuzpita kotak.ico" alt="Logo IpuzPita" class="w-full h-full object-contain" onerror="this.src='../assets/images/logo_ipuzpita.png'">
+        </div>
+
+        <div class="flex flex-col gap-6 items-center">
+            <!-- Tombol Tutup Sidebar Khusus Mobile -->
+            <button onclick="toggleMobileSidebar()" class="md:hidden w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-bold mb-2">✕</button>
+
+            <a href="dashboard.html" class="w-12 h-12 bg-red-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-red-200 transition transform hover:scale-105" title="Dashboard">📊</a>
+            <a href="buat_nota.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Buat Nota">📝</a>
+            <a href="riwayat.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Riwayat Pesanan">📜</a>
+            <a href="keuangan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Keuangan">💰</a>
+        </div>
+
+        <div class="flex flex-col gap-4 items-center">
+            <a href="pengaturan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Pengaturan">⚙️</a>
+            <a href="login.html" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
+        </div>
+    </aside>
+
+    <!-- 2. KONTEN UTAMA DASHBOARD -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden animate-fade-in">
+        
+        <!-- Top Bar / Header Sapaan & Search -->
+        <header class="h-16 md:h-20 bg-white border-b border-slate-100 px-3 md:px-8 flex items-center justify-between shrink-0 shadow-xs gap-3">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+                <!-- Tombol Garis Tiga (Hamburger Menu) -->
+                <button onclick="toggleMobileSidebar()" class="md:hidden w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl flex items-center justify-center font-bold text-base transition shadow-sm shrink-0" title="Menu Navigasi">
+                    ☰
+                </button>
+                <div class="overflow-hidden">
+                    <h1 class="text-xs sm:text-base md:text-2xl font-bold text-slate-900 flex items-center gap-2 truncate" id="welcome-title">
+                        Selamat datang kembali 👋
+                    </h1>
+                    <p class="hidden md:block text-xs text-slate-400" id="current-date-badge">Memuat tanggal...</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="relative hidden sm:block">
+                    <input type="text" id="searchInput" placeholder="Cari klien atau nomor invoice..." oninput="handleSearch(this.value)" class="bg-slate-50 text-sm px-4 py-2.5 pl-10 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500 w-60 lg:w-72 transition">
+                    <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-2xl border border-slate-100">
+                    <div class="w-7 h-7 md:w-9 md:h-9 bg-gradient-to-tr from-red-600 to-rose-400 text-white rounded-xl flex items-center justify-center font-bold text-xs md:text-sm shadow" id="profileInitial">
+                        YH
+                    </div>
+                    <div class="text-left hidden sm:block">
+                        <h4 class="text-xs font-bold text-slate-800" id="profileName">Memuat...</h4>
+                        <p class="text-[10px] text-slate-400" id="profileRole">Memuat...</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Body Grid Layout -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+            
+            <!-- Kolom Kiri & Tengah (Span 2) -->
+            <div class="lg:col-span-2 flex flex-col gap-6 md:gap-8">
+                
+                <!-- Section 1: Aktivitas Klien Terbaru -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm md:text-base font-bold text-slate-800">Aktivitas Klien Terbaru <span class="text-xs bg-slate-200 px-2 py-0.5 rounded-full text-slate-600" id="count-invoice-badge">0</span></h3>
+                        <a href="buat_nota.html" class="text-xs font-semibold text-red-600 hover:underline">+ Buat Nota Baru</a>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="activity-cards-container">
+                        <div class="p-5 text-sm text-slate-400 bg-white rounded-3xl border border-slate-100 animate-pulse col-span-2">Memuat data dari database Flask...</div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Ringkasan Progress & Keuangan Bulanan -->
+                <div>
+                    <h3 class="text-sm md:text-base font-bold text-slate-800 mb-4">Business & Financial Summary</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-md transition duration-300">
+                            <span class="text-xs text-slate-400 font-medium">Total Pelanggan Bulan Ini</span>
+                            <div class="flex items-baseline justify-between mt-4">
+                                <h2 class="text-xl md:text-2xl font-bold text-slate-800" id="total-pelanggan">0 Orang</h2>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-amber-50 to-yellow-50 p-5 rounded-3xl border border-amber-100 shadow-sm flex flex-col justify-between hover:shadow-md transition duration-300">
+                            <span class="text-xs text-amber-700 font-medium">Uang Diterima / Pemasukan</span>
+                            <div class="flex items-baseline justify-between mt-4">
+                                <h2 class="text-base md:text-lg font-bold text-amber-900" id="uang-diterima">Rp 0</h2>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-5 rounded-3xl border border-purple-100 shadow-sm flex flex-col justify-between hover:shadow-md transition duration-300">
+                            <span class="text-xs text-purple-700 font-medium">Total Invoice Aktif</span>
+                            <div class="flex items-baseline justify-between mt-4">
+                                <h2 class="text-xl md:text-2xl font-bold text-purple-900" id="total-invoice">0 Invoice</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Tabel Aktivitas Singkat -->
+                <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm md:text-base font-bold text-slate-800">Riwayat Nota Cepat</h3>
+                        <a href="riwayat.html" class="text-xs font-semibold text-red-600 hover:underline">Lihat Semua →</a>
+                    </div>
+                    <div class="flex flex-col gap-3" id="activity-list-container">
+                        <p class="text-xs text-slate-400">Tidak ada riwayat.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Kolom Kanan (Span 1): Kalender & Jadwal -->
+            <div class="flex flex-col gap-6">
+                
+                <!-- Widget Kalender Estetik -->
+                <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-bold text-slate-800" id="calendar-month-year">October 2026</h3>
+                        <div class="flex gap-1">
+                            <button onclick="changeMonth(-1)" class="w-7 h-7 bg-slate-50 rounded-lg flex items-center justify-center text-xs hover:bg-slate-100 transition" title="Bulan Lalu">⟨</button>
+                            <button onclick="changeMonth(1)" class="w-7 h-7 bg-slate-50 rounded-lg flex items-center justify-center text-xs hover:bg-slate-100 transition" title="Bulan Depan">⟩</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-7 text-center text-[11px] font-semibold text-slate-400 mb-2">
+                        <span>SEN</span><span>SEL</span><span>RAB</span><span>KAM</span><span>JUM</span><span>SAB</span><span>MIN</span>
+                    </div>
+
+                    <div class="grid grid-cols-7 gap-y-2 text-center text-xs" id="calendar-days-grid"></div>
+                </div>
+
+                <!-- Widget Jadwal Booking Makeup Mendatang -->
+                <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-4">
+                    <h3 class="text-sm font-bold text-slate-800">Jadwal Acara Klien</h3>
+                    <div id="upcoming-schedule-container" class="flex flex-col gap-3">
+                        <p class="text-xs text-slate-400">Memuat jadwal...</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Skrip JavaScript Terpadu (Pure Flask Fetch API & Sidebar Drawer) -->
+    <script>
+        let semuaTransaksiCache = [];
+        let today = new Date();
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const todayStr = today.toLocaleDateString('id-ID', options);
+            const dateBadge = document.getElementById('current-date-badge');
+            if (dateBadge) dateBadge.innerText = `Berikut rekapitulasi bisnis makeup hari ini, ${todayStr}`;
+
+            muatProfilUser();
+            muatDataDashboard();
+        });
+
+        // Fungsi Buka-Tutup Sidebar Mobile (Garis Tiga)
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        async function muatProfilUser() {
+            try {
+                let response = await fetch('/api/user_profile');
+                let res = await response.json();
+                
+                if (res && res.status === 'success') {
+                    const emailUser = res.email || 'owner@ipuzpita.com';
+                    const namaUser = res.nama || 'Ravi Hendrawan';
+                    
+                    const welcomeTitle = document.getElementById('welcome-title');
+                    if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali, ${namaUser} 👋`;
+                    
+                    const profileName = document.getElementById('profileName');
+                    const profileRole = document.getElementById('profileRole');
+                    if (profileName) profileName.innerText = namaUser;
+                    if (profileRole) profileRole.innerText = emailUser;
+
+                    const profileInitial = document.getElementById('profileInitial');
+                    if (profileInitial) {
+                        let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                        profileInitial.innerText = initials || 'YH';
+                    }
+                }
+            } catch (err) {
+                console.log("Gagal memuat profil:", err);
+            }
+        }
+
+        async function muatDataDashboard() {
+            try {
+                let response = await fetch('/api/dashboard_summary');
+                let data = await response.json();
+
+                if (data && data.status === 'success') {
+                    semuaTransaksiCache = data.transaksi_terbaru || [];
+
+                    animateValue('total-pelanggan', 0, data.total_pelanggan || 0, 800, " Orang");
+                    animateValue('total-invoice', 0, data.total_invoice || 0, 800, " Invoice");
+                    
+                    const badgeCount = document.getElementById('count-invoice-badge');
+                    if (badgeCount) badgeCount.innerText = data.total_invoice || 0;
+                    
+                    document.getElementById('uang-diterima').innerText = formatRupiah(data.uang_diterima || 0);
+
+                    renderActivityCards(semuaTransaksiCache);
+                    renderActivityList(semuaTransaksiCache);
+                    renderJadwalAcara(semuaTransaksiCache);
+                    generateCalendar(semuaTransaksiCache);
+                }
+            } catch (err) {
+                console.log("Gagal memuat ringkasan dashboard:", err);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(semuaTransaksiCache);
+        }
+
+        async function handleSearch(keyword) {
+            const query = keyword.toLowerCase().trim();
+            const filtered = semuaTransaksiCache.filter(item => 
+                (item.nama_klien && item.nama_klien.toLowerCase().includes(query)) ||
+                (item.no_nota && item.no_nota.toLowerCase().includes(query))
+            );
+
+            renderActivityCards(filtered);
+            renderActivityList(filtered);
+        }
+
+        function generateCalendar(listTransaksi) {
+            const calendarGrid = document.getElementById('calendar-days-grid');
+            const monthYearLabel = document.getElementById('calendar-month-year');
+            if (!calendarGrid) return;
+
+            const namaBulan = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            if (monthYearLabel) monthYearLabel.innerText = `${namaBulan[currentMonth]} ${currentYear}`;
+
+            const firstDayIndex = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
+            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const prevTotalDays = new Date(currentYear, currentMonth, 0).getDate();
+
+            let tanggalAcaraSet = new Set();
+            if (listTransaksi) {
+                listTransaksi.forEach(item => {
+                    if (item.tgl_acara) {
+                        tanggalAcaraSet.add(item.tgl_acara);
+                    }
+                });
+            }
+
+            let daysHTML = "";
+            for (let i = firstDayIndex; i > 0; i--) {
+                daysHTML += `<span class="text-slate-300 py-1.5">${prevTotalDays - i + 1}</span>`;
+            }
+
+            const nowToday = new Date();
+            for (let i = 1; i <= totalDays; i++) {
+                let monthStr = String(currentMonth + 1).padStart(2, '0');
+                let dayStr = String(i).padStart(2, '0');
+                let dateFormatted = `${currentYear}-${monthStr}-${dayStr}`;
+
+                let hasEvent = tanggalAcaraSet.has(dateFormatted);
+                let isToday = (i === nowToday.getDate() && currentMonth === nowToday.getMonth() && currentYear === nowToday.getFullYear());
+
+                if (isToday) {
+                    daysHTML += `<span class="py-1.5 bg-red-600 text-white font-bold rounded-full w-7 h-7 mx-auto flex items-center justify-center shadow-md shadow-red-200 relative">${i}${hasEvent ? '<span class="absolute bottom-0 w-1.5 h-1.5 bg-yellow-300 rounded-full"></span>' : ''}</span>`;
+                } else if (hasEvent) {
+                    daysHTML += `<span class="py-1.5 bg-teal-100 text-teal-800 font-bold rounded-full w-7 h-7 mx-auto flex items-center justify-center relative cursor-pointer" title="Ada Jadwal Acara">${i}<span class="absolute bottom-0.5 w-1.5 h-1.5 bg-red-600 rounded-full"></span></span>`;
+                } else {
+                    daysHTML += `<span class="py-1.5 text-slate-600 hover:bg-slate-100 rounded-full w-7 h-7 mx-auto flex items-center justify-center cursor-pointer transition">${i}</span>`;
+                }
+            }
+            calendarGrid.innerHTML = daysHTML;
+        }
+
+        function animateValue(id, start, end, duration, suffix = "") {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerText = Math.floor(progress * (end - start) + start) + suffix;
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        }
+
+        function bukaHalamanEdit(noNota) {
+            localStorage.setItem('selectedInvoiceNo', noNota);
+            window.location.href = 'edit_nota.html';
+        }
+
+        function renderActivityCards(list) {
+            const container = document.getElementById('activity-cards-container');
+            if (!container) return;
+            if (!list || list.length === 0) {
+                container.innerHTML = `<div class="p-5 text-sm text-slate-400 bg-white rounded-3xl border border-slate-100 col-span-2">Belum ada data transaksi tersimpan di database.</div>`;
+                return;
+            }
+            container.innerHTML = list.slice(0, 2).map((item, index) => `
+                <div class="bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-100 p-5 rounded-3xl shadow-sm relative group cursor-pointer hover:shadow-md transition transform hover:-translate-y-1 animate-fade-in" style="animation-delay: ${index * 150}ms;" onclick="bukaHalamanEdit('${item.no_nota}')">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="text-[10px] font-bold bg-teal-200 text-teal-800 px-2.5 py-1 rounded-full">${item.no_nota}</span>
+                            <h4 class="text-base font-bold text-slate-800 mt-2">${item.nama_klien}</h4>
+                        </div>
+                        <span class="text-xs bg-white text-teal-700 font-bold px-2 py-1 rounded-xl shadow-sm">⭐ ${item.status}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Lokasi: ${item.lokasi_venue || 'Studio Utama'}</p>
+                    <div class="flex justify-between items-center pt-3 border-t border-teal-100/60">
+                        <span class="text-xs font-bold text-teal-900">${formatRupiah(item.total_tagihan)}</span>
+                        <span class="w-8 h-8 bg-white text-teal-700 rounded-full flex items-center justify-center shadow">✏️</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderActivityList(list) {
+            const container = document.getElementById('activity-list-container');
+            if (!container) return;
+            if (!list || list.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400">Tidak ada riwayat.</p>`;
+                return;
+            }
+            container.innerHTML = list.map((item, index) => `
+                <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl cursor-pointer hover:bg-slate-100 transition animate-fade-in" style="animation-delay: ${index * 100}ms;" onclick="bukaHalamanEdit('${item.no_nota}')">
+                    <span class="text-xs font-bold text-slate-800">${item.no_nota} - ${item.nama_klien}</span>
+                    <span class="text-xs bg-blue-50 text-blue-700 font-semibold px-3 py-1 rounded-xl">${item.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderJadwalAcara(listTransaksi) {
+            const container = document.getElementById('upcoming-schedule-container');
+            if (!container) return;
+            if (!listTransaksi || listTransaksi.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400">Tidak ada jadwal.</p>`;
+                return;
+            }
+            container.innerHTML = listTransaksi.map((item, index) => `
+                <div class="flex items-start gap-3 p-3 bg-teal-50/50 rounded-2xl border border-teal-100 transition hover:bg-teal-100/60 animate-fade-in" style="animation-delay: ${index * 120}ms;">
+                    <div class="w-10 h-10 bg-teal-100 text-teal-800 rounded-xl flex flex-col items-center justify-center font-bold text-xs shrink-0">
+                        <span>${item.tgl_acara ? item.tgl_acara.slice(-2) : '28'}</span>
+                        <span class="text-[9px] uppercase font-normal">Okt</span>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-slate-800">${item.nama_klien}</h4>
+                        <p class="text-[11px] text-slate-500 mt-0.5">${item.lokasi_venue || 'Studio Utama'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

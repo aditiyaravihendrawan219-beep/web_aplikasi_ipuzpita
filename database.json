@@ -1,0 +1,12 @@
+{
+  "users": [
+    {
+      "email": "aditiyaravi218@gmail.com",
+      "password": "password123",
+      "nama": "Ravi Hendrawan",
+      "token": "ADMINIPUZPITA"
+    }
+  ],
+  "transaksi": [],
+  "pengeluaran": []
+}

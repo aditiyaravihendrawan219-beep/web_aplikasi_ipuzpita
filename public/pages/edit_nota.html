@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Nota Transaksi - IpuzPita MAKE UP</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f6f9; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row h-screen overflow-hidden text-slate-800">
+
+    <!-- 1. SIDEBAR DESKTOP & MOBILE DRAWER -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden md:hidden transition-opacity opacity-0" onclick="toggleMobileSidebar()"></div>
+
+    <aside id="sidebarMenu" class="fixed md:static inset-y-0 left-0 w-20 bg-white border-r border-slate-100 flex flex-col items-center py-6 justify-between shrink-0 shadow-sm z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <div class="hidden md:flex w-12 h-12 bg-red-50/50 rounded-2xl items-center justify-center p-2 shadow-inner border border-red-100">
+            <img src="../assets/logo ipuzpita kotak.ico" alt="Logo IpuzPita" class="w-full h-full object-contain" onerror="this.src='../assets/images/logo_ipuzpita.png'">
+        </div>
+
+        <div class="flex flex-col gap-6 items-center">
+            <button onclick="toggleMobileSidebar()" class="md:hidden w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-bold mb-2">✕</button>
+
+            <a href="dashboard.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Dashboard">📊</a>
+            <a href="buat_nota.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Buat Nota">📝</a>
+            <a href="riwayat.html" class="w-12 h-12 bg-red-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-red-200 transition transform hover:scale-105" title="Riwayat Pesanan">📜</a>
+            <a href="keuangan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Keuangan">💰</a>
+        </div>
+
+        <div class="flex flex-col gap-4 items-center">
+            <a href="pengaturan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Pengaturan">⚙️</a>
+            <a href="login.html" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
+        </div>
+    </aside>
+
+    <!-- 2. KONTEN UTAMA EDIT NOTA -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- Top Bar Header -->
+        <header class="h-16 md:h-20 bg-white border-b border-slate-100 px-3 md:px-8 flex items-center justify-between shrink-0 gap-3">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+                <button onclick="toggleMobileSidebar()" class="md:hidden w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl flex items-center justify-center font-bold text-base transition shadow-sm shrink-0" title="Menu Navigasi">
+                    ☰
+                </button>
+                <div class="overflow-hidden">
+                    <h1 class="text-xs sm:text-sm md:text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap overflow-x-auto custom-scrollbar pb-0.5" id="pageTitle">
+                        Edit Nota Transaksi ✏️
+                    </h1>
+                    <p class="hidden md:block text-xs text-slate-400">Perbarui data klien, ubah status pembayaran, atau kelola rincian paket dan item.</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-2xl border border-slate-100 shadow-sm shrink-0">
+                <div class="w-7 h-7 md:w-9 md:h-9 bg-gradient-to-tr from-red-600 to-rose-400 text-white rounded-xl flex items-center justify-center font-bold text-xs md:text-sm shadow" id="profileAvatar">
+                    YH
+                </div>
+                <div class="text-left hidden sm:block">
+                    <h4 class="text-xs font-bold text-slate-800" id="profileName">Memuat...</h4>
+                    <p class="text-[10px] text-slate-400" id="profileRole">Memuat...</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Kontainer Luar yang Lebar & Lega -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8">
+            <div class="w-full max-w-6xl mx-auto bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-6">
+                
+                <input type="hidden" id="editInvoiceNo">
+
+                <!-- Baris 1: Nama Klien & Tanggal Acara -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-semibold text-slate-600">Nama Klien *</label>
+                        <input type="text" id="editNamaKlien" class="bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500 transition" placeholder="Contoh: NABILA & RENGGAN">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-semibold text-slate-600">Tanggal Acara *</label>
+                        <input type="date" id="editTanggalAcara" class="bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500 transition">
+                    </div>
+                </div>
+
+                <!-- Lokasi / Alamat Acara -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold text-slate-600">Lokasi / Alamat Acara *</label>
+                    <textarea id="editLokasi" class="bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500 transition resize-none" rows="2" placeholder="Masukkan alamat lengkap lokasi acara..."></textarea>
+                </div>
+
+                <!-- Baris 2: Status Pembayaran & Nominal DP -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-semibold text-slate-600">Status Pembayaran *</label>
+                        <select id="editStatusPembayaran" class="bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500 transition" onchange="updateFormDP()">
+                            <option value="Menunggu Pembayaran">Menunggu Pembayaran</option>
+                            <option value="DP Masuk">DP Masuk</option>
+                            <option value="Lunas">Lunas</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1.5" id="boxNominalDpEdit" style="display: none;">
+                        <label class="text-xs font-semibold text-slate-600">Nominal DP Masuk (Rp)</label>
+                        <input type="text" id="editNominalDp" class="bg-slate-50 text-sm px-4 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:border-red-500 transition" placeholder="Contoh: 5.000.000" oninput="formatInputRupiah(this); hitungTotalEdit()">
+                    </div>
+                </div>
+
+                <!-- Bagian Item Layanan -->
+                <div class="flex flex-col gap-2 pt-2">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-slate-600">Daftar Item / Layanan & Paket:</label>
+                        <button type="button" onclick="tambahBarisItemEdit('utama', '', 1, 0, '')" class="text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-xl transition">+ Tambah Item / Paket</button>
+                    </div>
+                    
+                    <div id="containerItemEdit" class="flex flex-col gap-3">
+                        <!-- Baris item dirender dinamis -->
+                    </div>
+                </div>
+
+                <!-- Ringkasan Finansial Modern -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col gap-2.5 text-xs mt-2">
+                    <div class="flex justify-between text-slate-600">
+                        <span>Total Tagihan Baru:</span>
+                        <strong id="grandTotalEdit" class="text-slate-800 text-sm font-bold">Rp 0</strong>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>Sudah Dibayar (DP / Lunas):</span>
+                        <strong id="sudahDibayarEdit" class="text-emerald-600 font-semibold">Rp 0</strong>
+                    </div>
+                    <hr class="border-slate-200 my-1">
+                    <div class="flex justify-between text-sm font-bold">
+                        <span class="text-slate-800">Sisa Kekurangan Pembayaran:</span>
+                        <strong id="sisaTagihanEdit" class="text-red-600 text-base">Rp 0</strong>
+                    </div>
+                </div>
+
+                <!-- Aksi Tombol Bawah -->
+                <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                    <button onclick="window.location.href='riwayat.html'" class="w-full sm:w-auto px-5 py-3 bg-slate-100 text-slate-600 text-xs font-semibold rounded-2xl hover:bg-slate-200 transition">Batal / Kembali</button>
+                    <button onclick="bukaPratinjauNota()" class="w-full sm:w-auto px-5 py-3 bg-blue-50 text-blue-600 text-xs font-semibold rounded-2xl hover:bg-blue-100 transition">👁️ Pratinjau Nota</button>
+                    <button onclick="simpanPerubahanNota()" class="w-full sm:w-auto px-6 py-3 bg-red-600 text-white text-xs font-bold rounded-2xl shadow-md shadow-red-200 hover:bg-red-700 transition">💾 Simpan Perubahan</button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- KUSTOM TOAST NOTIFIKASI -->
+    <div id="toastNotif" class="fixed top-6 right-6 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-800">
+            <span id="toastIcon" class="text-xl">⚠️</span>
+            <div>
+                <h5 class="text-xs font-bold text-slate-200" id="toastTitle">Peringatan</h5>
+                <p class="text-xs text-slate-400" id="toastMsg">Pesan notifikasi di sini.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Terpadu -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let rawInv = urlParams.get('inv') || urlParams.get('no_inv') || localStorage.getItem('selectedInvoiceNo');
+            
+            const invoiceNo = rawInv ? rawInv.replace('#', '').trim() : null;
+
+            muatProfilUser();
+            inisialisasiNavigasiEnter();
+
+            if (invoiceNo) {
+                muatDataNota(invoiceNo);
+                localStorage.removeItem('selectedInvoiceNo');
+            } else {
+                showToast("Peringatan", "Nomor invoice tidak ditemukan!", "warning");
+                setTimeout(() => { window.location.href = 'riwayat.html'; }, 1500);
+            }
+        });
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebarMenu');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        async function muatProfilUser() {
+            try {
+                let response = await fetch('/api/user_profile');
+                let res = await response.json();
+                if (res && res.status === 'success') {
+                    if (document.getElementById('profileName')) document.getElementById('profileName').innerText = res.nama || 'Ravi Hendrawan';
+                    if (document.getElementById('profileRole')) document.getElementById('profileRole').innerText = res.email || 'aditiyaravi218@gmail.com';
+                    if (document.getElementById('profileAvatar')) {
+                        let initials = (res.nama || 'Ravi').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                        document.getElementById('profileAvatar').innerText = initials;
+                    }
+                }
+            } catch (err) {
+                console.log("Gagal memuat profil:", err);
+            }
+        }
+
+        async function muatDataNota(invoiceNo) {
+            document.getElementById('pageTitle').innerText = 'Memuat Data ' + invoiceNo + '...';
+
+            try {
+                let response = await fetch(`/api/detail_transaksi/${invoiceNo}`);
+                let res = await response.json();
+
+                if (res.success) {
+                    let trx = res.transaksi;
+                    document.getElementById('pageTitle').innerText = `Edit: ${trx.invoice_no}`;
+                    document.getElementById('editInvoiceNo').value = trx.invoice_no;
+                    document.getElementById('editNamaKlien').value = trx.nama_klien;
+                    document.getElementById('editTanggalAcara').value = trx.tanggal_acara;
+                    document.getElementById('editLokasi').value = trx.lokasi_venue || '';
+                    document.getElementById('editStatusPembayaran').value = trx.status;
+
+                    document.getElementById('editNominalDp').value = trx.nominal_dp ? parseInt(trx.nominal_dp).toLocaleString('id-ID') : 0; 
+                    updateFormDP();
+
+                    const container = document.getElementById('containerItemEdit');
+                    container.innerHTML = '';
+
+                    if (res.items && res.items.length > 0) {
+                        res.items.forEach(item => {
+                            let subText = item.sub || item.sub_keterangan || item.keterangan || '';
+                            tambahBarisItemEdit(
+                                item.tipe || item.tipe_item || 'utama', 
+                                item.nama || item.deskripsi || '', 
+                                item.qty || 1, 
+                                item.harga || 0, 
+                                subText
+                            );
+                        });
+                    } else {
+                        tambahBarisItemEdit('utama', 'Paket Makeup', 1, trx.total_tagihan || 0, '');
+                    }
+
+                    hitungTotalEdit();
+                } else {
+                    showToast("Gagal", 'Gagal memuat data: ' + res.message, "error");
+                    setTimeout(() => { window.location.href = 'riwayat.html'; }, 1500);
+                }
+            } catch (e) {
+                showToast("Kesalahan Jaringan", "Gagal memuat detail nota.", "error");
+            }
+        }
+
+        function formatInputRupiah(input) {
+            let value = input.value.replace(/\D/g, '');
+            input.value = value === "" ? "" : parseInt(value, 10).toLocaleString('id-ID');
+        }
+
+        function parseNominalPure(valStr) {
+            if (!valStr) return 0;
+            return parseInt(valStr.toString().replace(/\D/g, ''), 10) || 0;
+        }
+
+        function toggleSubKeteranganEdit(selectEl) {
+            const row = selectEl.closest('.item-row');
+            const subBox = row.querySelector('.row-sub-box');
+            if (selectEl.value === 'utama') {
+                subBox.style.display = 'flex';
+            } else {
+                subBox.style.display = 'none';
+            }
+            hitungTotalEdit();
+        }
+
+        function updateFormDP() {
+            let status = document.getElementById('editStatusPembayaran').value;
+            let boxDp = document.getElementById('boxNominalDpEdit');
+            if (boxDp) {
+                boxDp.style.display = status === "DP Masuk" ? "flex" : "none";
+            }
+            hitungTotalEdit();
+        }
+
+        function hitungTotalEdit() {
+            let total = 0;
+            const rows = document.querySelectorAll('.item-row');
+            rows.forEach(row => {
+                let tipe = row.querySelector('.item-tipe').value;
+                let qty = parseInt(row.querySelector('.item-qty').value) || 1;
+                let harga = parseNominalPure(row.querySelector('.item-harga').value);
+
+                if (tipe === 'diskon') {
+                    total -= (harga * qty);
+                } else {
+                    total += (harga * qty);
+                }
+            });
+
+            let status = document.getElementById('editStatusPembayaran').value;
+            let dp = parseNominalPure(document.getElementById('editNominalDp').value);
+
+            let dibayar = status === "Lunas" ? total : (status === "DP Masuk" ? dp : 0);
+            let sisa = Math.max(0, total - dibayar);
+
+            document.getElementById('grandTotalEdit').innerText = 'Rp ' + total.toLocaleString('id-ID');
+            document.getElementById('sudahDibayarEdit').innerText = 'Rp ' + dibayar.toLocaleString('id-ID');
+            document.getElementById('sisaTagihanEdit').innerText = 'Rp ' + sisa.toLocaleString('id-ID');
+        }
+
+        function tambahBarisItemEdit(tipe = 'utama', nama = '', qty = 1, harga = 0, sub = '') {
+            const container = document.getElementById('containerItemEdit');
+            const row = document.createElement('div');
+            row.className = 'item-row bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col gap-3';
+            
+            let displaySub = tipe === 'utama' ? 'flex' : 'none';
+
+            row.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
+                    <div class="sm:col-span-3">
+                        <select class="item-tipe bg-white text-xs font-semibold px-3 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-red-500 w-full" onchange="toggleSubKeteranganEdit(this)">
+                            <option value="utama" ${tipe === 'utama' ? 'selected' : ''}>Paket Utama</option>
+                            <option value="tambahan" ${tipe === 'tambahan' ? 'selected' : ''}>Item Tambahan</option>
+                            <option value="diskon" ${tipe === 'diskon' ? 'selected' : ''}>Diskon</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-5">
+                        <input type="text" class="input-text item-nama bg-white text-sm px-4 py-2.5 rounded-xl border border-slate-200 w-full focus:outline-none focus:border-red-500" placeholder="Nama Paket / Layanan" value="${nama}" oninput="hitungTotalEdit()">
+                    </div>
+                    <div class="sm:col-span-1 flex items-center justify-center bg-white px-2 py-2 rounded-xl border border-slate-200">
+                        <input type="number" class="input-text item-qty bg-transparent text-sm w-full text-center focus:outline-none font-bold text-slate-700" value="${qty}" min="1" oninput="hitungTotalEdit()" title="Qty">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <input type="text" class="input-text item-harga bg-white text-sm px-3 py-2.5 rounded-xl border border-slate-200 w-full focus:outline-none focus:border-red-500" placeholder="Harga (Rp)" value="${harga ? harga.toLocaleString('id-ID') : ''}" oninput="formatInputRupiah(this); hitungTotalEdit();">
+                    </div>
+                    <div class="sm:col-span-1 flex justify-center">
+                        <button type="button" class="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center hover:bg-red-100 transition shrink-0" onclick="hapusBarisItem(this)" title="Hapus Baris">✕</button>
+                    </div>
+                </div>
+                
+                <div class="row-sub-box flex-col gap-1.5" style="display: ${displaySub};">
+                    <span class="text-xs font-semibold text-slate-500">Rincian / Sub-Keterangan di bawah paket (pisahkan dengan enter):</span>
+                    <!-- Diperlebar menjadi 7 baris -->
+                    <textarea class="input-text item-sub bg-white text-xs px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none resize-y" rows="7">${sub || ''}</textarea>
+                </div>
+            `;
+            container.appendChild(row);
+            hitungTotalEdit();
+        }
+
+        function hapusBarisItem(btn) {
+            const rows = document.querySelectorAll('.item-row');
+            if (rows.length > 1) {
+                btn.closest('.item-row').remove();
+                hitungTotalEdit();
+            } else {
+                showToast("Perhatian", "Minimal harus ada 1 item layanan dalam nota!", "warning");
+            }
+        }
+
+        // ==========================================
+        // FITUR NAVIGASI ENTER BERUNTUN & SHORTCUT
+        // ==========================================
+        function inisialisasiNavigasiEnter() {
+            const inputNama = document.getElementById('editNamaKlien');
+            const inputTanggal = document.getElementById('editTanggalAcara');
+            const inputLokasi = document.getElementById('editLokasi');
+            const inputDp = document.getElementById('editNominalDp');
+
+            if (inputNama) {
+                inputNama.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        inputTanggal.focus();
+                    }
+                });
+            }
+
+            if (inputTanggal) {
+                inputTanggal.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        inputLokasi.focus();
+                    }
+                });
+            }
+
+            // Enter di Nominal DP langsung Simpan Perubahan
+            if (inputDp) {
+                inputDp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        simpanPerubahanNota();
+                    }
+                });
+            }
+        }
+
+        function validasiFormEdit() {
+            let nama = document.getElementById('editNamaKlien').value.trim();
+            let tanggal = document.getElementById('editTanggalAcara').value;
+
+            if (!nama) {
+                showToast("Form Belum Lengkap", "Nama Klien wajib diisi!", "warning");
+                document.getElementById('editNamaKlien').focus();
+                return false;
+            }
+            if (!tanggal) {
+                showToast("Form Belum Lengkap", "Tanggal acara wajib diisi!", "warning");
+                document.getElementById('editTanggalAcara').focus();
+                return false;
+            }
+            return true;
+        }
+
+        function getDaftarItemLayanan() {
+            const rows = document.querySelectorAll('.item-row');
+            let items = [];
+            rows.forEach(row => {
+                let tipe = row.querySelector('.item-tipe').value;
+                let nama = row.querySelector('.item-nama').value.trim();
+                let harga = parseNominalPure(row.querySelector('.item-harga').value);
+                let qty = parseInt(row.querySelector('.item-qty').value) || 1;
+                let subEl = row.querySelector('.item-sub');
+                let sub = subEl ? subEl.value.trim() : '';
+
+                if (nama || harga > 0) {
+                    items.push({ tipe: tipe, nama: nama, harga: harga, qty: qty, sub: sub });
+                }
+            });
+            return items;
+        }
+
+        function bukaPratinjauNota() {
+            if (!validasiFormEdit()) return;
+
+            const invoiceNo = document.getElementById('editInvoiceNo').value;
+            let nama = document.getElementById('editNamaKlien').value.trim();
+            let items = getDaftarItemLayanan();
+            let total = parseNominalPure(document.getElementById('grandTotalEdit').innerText);
+
+            let dataNota = {
+                no_inv: invoiceNo,
+                nama: nama,
+                tanggal: document.getElementById('editTanggalAcara').value,
+                items: items,
+                total: total,
+                status: document.getElementById('editStatusPembayaran').value,
+                dp: parseNominalPure(document.getElementById('editNominalDp').value),
+                sisa: parseNominalPure(document.getElementById('sisaTagihanEdit').innerText)
+            };
+
+            localStorage.setItem('previewDataNota', JSON.stringify(dataNota));
+            window.open('nota_template.html', '_blank');
+        }
+
+        async function simpanPerubahanNota() {
+            if (!validasiFormEdit()) return;
+
+            const invoiceNo = document.getElementById('editInvoiceNo').value;
+            const namaKlien = document.getElementById('editNamaKlien').value.trim();
+            const tanggalAcara = document.getElementById('editTanggalAcara').value;
+            const status = document.getElementById('editStatusPembayaran').value;
+            let nominalDp = parseNominalPure(document.getElementById('editNominalDp').value);
+
+            if (status === 'DP Masuk' && nominalDp <= 0) {
+                showToast("DP Belum Diisi", "Nominal DP wajib diisi jika status pembayaran adalah DP Masuk!", "warning");
+                document.getElementById('editNominalDp').focus();
+                return;
+            }
+
+            let items = getDaftarItemLayanan();
+            let totalTagihan = parseNominalPure(document.getElementById('grandTotalEdit').innerText);
+            let sisaTagihan = parseNominalPure(document.getElementById('sisaTagihanEdit').innerText);
+
+            const dataBaru = {
+                no_inv: invoiceNo,
+                nama: namaKlien,
+                hp: "-", 
+                tanggal: tanggalAcara,
+                lokasi: document.getElementById('editLokasi').value.trim(),
+                status: status,
+                total: totalTagihan,
+                dp: nominalDp,
+                sisa: sisaTagihan,
+                items: items
+            };
+
+            try {
+                let response = await fetch('/api/simpan_nota_baru', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataBaru)
+                });
+                let res = await response.json();
+
+                if (res && res.status === 'success') {
+                    showToast("Berhasil!", "Nota berhasil diperbarui secara permanen!", "success");
+                    setTimeout(() => {
+                        window.location.href = 'riwayat.html';
+                    }, 1000);
+                } else {
+                    showToast("Gagal", (res ? res.message : 'Kesalahan tak dikenal'), "error");
+                }
+            } catch (e) {
+                showToast("Kesalahan Jaringan", "Gagal menyimpan perubahan nota.", "error");
+            }
+        }
+
+        // Fungsi Toast Global
+        function showToast(judul, pesan, tipe = 'warning') {
+            const toast = document.getElementById('toastNotif');
+            const titleEl = document.getElementById('toastTitle');
+            const msgEl = document.getElementById('toastMsg');
+            const iconEl = document.getElementById('toastIcon');
+
+            if (!toast) return;
+
+            titleEl.innerText = judul;
+            msgEl.innerText = pesan;
+            iconEl.innerText = tipe === 'success' ? '✅' : (tipe === 'error' ? '❌' : '⚠️');
+
+            toast.classList.remove('-translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>

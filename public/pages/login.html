@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In & Sign Up - IpuzPita MAKE UP</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <!-- Tailwind CSS CDN untuk Komponen Toast & Animasi Kustom -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-slate-100 overflow-hidden">
+
+    <!-- Kartu Utama Login / Sign Up -->
+    <div class="login-card" id="loginCard">
+        
+        <!-- FORM SIGN IN -->
+        <div class="form-left">
+            <img src="../assets/logo_ipuzpita.png" alt="Logo" class="brand-logo">
+            <p class="form-title">Sign in With Email & Password</p>
+
+            <div class="input-box">
+                <input type="email" id="loginEmail" placeholder="Masukkan Email (@gmail.com)" required>
+            </div>
+
+            <div class="input-box password-box">
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <span class="toggle-password" onclick="togglePasswordVisibility('loginPassword', this)">👁️</span>
+            </div>
+
+            <a href="#" class="forgot-link" onclick="bukaModalReset()">Forgot Password</a>
+
+            <button type="button" class="btn-signin" onclick="prosesLogin()">SIGN IN</button>
+            <p style="font-size: 12px; margin-top: 15px; color: #555;">
+                Don't have an account? <span style="color: #E10600; font-weight: 700; cursor: pointer;" onclick="toggleAuthMode()">Sign Up</span>
+            </p>
+        </div>
+
+        <!-- BANNER KANAN -->
+        <div class="banner-right">
+            <h2 class="banner-heading img-signin">Selamat Datang<br>Kembali</h2>
+            <h2 class="banner-heading img-signup" style="display: none;">Mulai Bergabung<br>Bersama Kami</h2>
+            <img src="../assets/ilustrasi_2.png" alt="Ilustrasi" class="illustration-img img-signin">
+            <img src="../assets/ilustrasi_1.png" alt="Ilustrasi Sign Up" class="illustration-img img-signup">
+        </div>
+
+        <!-- FORM SIGN UP -->
+        <div class="form-signup-container">
+            <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 5px; color: #111;">Buat Akun Baru</h3>
+            <p class="form-title">Daftar dengan Token Rahasia Admin</p>
+
+            <div class="input-box">
+                <input type="email" id="signupEmail" placeholder="Email (@gmail.com)" required>
+            </div>
+
+            <div class="input-box password-box">
+                <input type="password" id="signupPassword" placeholder="Password Baru" required>
+                <span class="toggle-password" onclick="togglePasswordVisibility('signupPassword', this)">👁️</span>
+            </div>
+
+            <div class="input-box">
+                <input type="password" id="signupToken" placeholder="Token Rahasia" required>
+            </div>
+
+            <button type="button" class="btn-signin" onclick="prosesRegister()" style="margin-top: 5px;">SIGN UP</button>
+            <p style="font-size: 12px; margin-top: 12px; color: #555;">
+                Already have an account? <span style="color: #E10600; font-weight: 700; cursor: pointer;" onclick="toggleAuthMode()">Sign In</span>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- MODAL / FORM FORGOT PASSWORD -->
+    <div id="resetModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+        <div class="bg-white w-full max-w-md p-8 rounded-3xl shadow-2xl border border-slate-100 transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-800">Pemulihan Kata Sandi</h3>
+                <button onclick="tutupModalReset()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+            </div>
+            <p class="text-xs text-slate-500 mb-6">Masukkan email akun Anda, Token Rahasia Admin, dan kata sandi baru untuk mereset akun.</p>
+
+            <div class="space-y-4">
+                <div class="input-box">
+                    <input type="email" id="resetEmail" placeholder="Email Terdaftar (@gmail.com)" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-500">
+                </div>
+                
+                <div class="input-box password-box relative">
+                    <input type="password" id="resetToken" placeholder="Token Rahasia Admin" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-500">
+                    <span class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer select-none text-sm" onclick="togglePasswordVisibility('resetToken', this)">👁️</span>
+                </div>
+
+                <div class="input-box password-box relative">
+                    <input type="password" id="resetPasswordBaru" placeholder="Password Baru" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-500">
+                    <span class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer select-none text-sm" onclick="togglePasswordVisibility('resetPasswordBaru', this)">👁️</span>
+                </div>
+
+                <button type="button" onclick="prosesResetPassword()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-red-500/30">
+                    RESET PASSWORD
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KUSTOM TOAST NOTIFIKASI -->
+    <div id="toastNotif" class="fixed top-6 right-6 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-800">
+            <span id="toastIcon" class="text-xl">✅</span>
+            <div>
+                <h5 class="text-xs font-bold text-slate-200" id="toastTitle">Berhasil!</h5>
+                <p class="text-xs text-slate-400" id="toastMsg">Login berhasil dilakukan.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Kustom Toast & Interaksi Auth (Pure Flask API) -->
+    <script>
+        function toggleAuthMode() {
+            const card = document.getElementById('loginCard');
+            card.classList.toggle('active-signup');
+        }
+
+        function togglePasswordVisibility(fieldId, iconEl) {
+            const input = document.getElementById(fieldId);
+            if (!input) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                iconEl.innerText = '🙈';
+            } else {
+                input.type = 'password';
+                iconEl.innerText = '👁️';
+            }
+        }
+
+        function showToast(title, msg, type = 'success') {
+            const toast = document.getElementById('toastNotif');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            if (!toast) return;
+
+            toastTitle.innerText = title;
+            toastMsg.innerText = msg;
+            toastIcon.innerText = type === 'success' ? '✅' : '⚠️';
+
+            toast.classList.remove('-translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('-translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        async function prosesLogin() {
+            let email = document.getElementById('loginEmail').value.trim();
+            let password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showToast("Peringatan", "Email dan password wajib diisi!", "error");
+                return;
+            }
+
+            try {
+                let response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+                let res = await response.json();
+
+                if (res && res.status === 'success') {
+                    showToast("Login Berhasil!", "Mengalihkan ke halaman dashboard...");
+                    localStorage.setItem('userEmail', email);
+                    setTimeout(() => {
+                     // Menggunakan jalur absolut dari folder public, sehingga tidak akan pernah bertumpuk jadi /pages/pages/
+                    window.location.href = 'dashboard.html';
+                    }, 1200);
+                } else {
+                    showToast("Login Gagal", res.message || "Email atau password salah!", "error");
+                }
+            } catch (e) {
+                showToast("Kesalahan Sistem", "Gagal terhubung ke server!", "error");
+            }
+        }
+
+        async function prosesRegister() {
+            let email = document.getElementById('signupEmail').value.trim();
+            let password = document.getElementById('signupPassword').value;
+            let token = document.getElementById('signupToken').value.trim();
+
+            if (!email || !password || !token) {
+                showToast("Peringatan", "Semua kolom pendaftaran wajib diisi!", "error");
+                return;
+            }
+
+            try {
+                let response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password, token: token })
+                });
+                let res = await response.json();
+
+                if (res && res.status === 'success') {
+                    showToast("Registrasi Berhasil!", "Silakan login menggunakan akun baru.");
+                    setTimeout(() => toggleAuthMode(), 1500);
+                } else {
+                    showToast("Registrasi Gagal", res.message || "Terjadi kesalahan.", "error");
+                }
+            } catch (e) {
+                showToast("Kesalahan Sistem", "Gagal terhubung ke server Flask!", "error");
+            }
+        }
+
+        function bukaModalReset() {
+            const modal = document.getElementById('resetModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function tutupModalReset() {
+            const modal = document.getElementById('resetModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function prosesResetPassword() {
+            let email = document.getElementById('resetEmail').value.trim();
+            let token = document.getElementById('resetToken').value.trim();
+            let passwordBaru = document.getElementById('resetPasswordBaru').value;
+
+            if (!email || !token || !passwordBaru) {
+                showToast("Peringatan", "Semua kolom pemulihan wajib diisi!", "error");
+                return;
+            }
+
+            try {
+                let response = await fetch('/api/reset_password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, token: token, password_baru: passwordBaru })
+                });
+                let res = await response.json();
+
+                if (res && res.status === 'success') {
+                    showToast("Berhasil!", "Password berhasil diubah. Silakan login.");
+                    tutupModalReset();
+                    document.getElementById('resetEmail').value = '';
+                    document.getElementById('resetToken').value = '';
+                    document.getElementById('resetPasswordBaru').value = '';
+                } else {
+                    showToast("Gagal", res.message || "Token atau email tidak valid!", "error");
+                }
+            } catch (e) {
+                showToast("Kesalahan Sistem", "Gagal terhubung ke server Flask!", "error");
+            }
+        }
+
+        // ==========================================
+        // FITUR NAVIGASI ENTER (Email -> Password -> Sign In)
+        // ==========================================
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+
+        if (loginEmail) {
+            loginEmail.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (loginPassword) loginPassword.focus(); // Pindah otomatis ke kolom password
+                }
+            });
+        }
+
+        if (loginPassword) {
+            loginPassword.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    prosesLogin(); // Otomatis pencet Sign In saat enter ditekan di password
+                }
+            });
+        }
+
+        // Navigasi Enter untuk form Sign Up
+        ['signupEmail', 'signupPassword', 'signupToken'].forEach((id, index, arr) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (index < arr.length - 1) {
+                            document.getElementById(arr[index + 1]).focus();
+                        } else {
+                            prosesRegister();
+                        }
+                    }
+                });
+            }
+        });
+
+        // Navigasi Enter untuk form Reset Password
+        ['resetEmail', 'resetToken', 'resetPasswordBaru'].forEach((id, index, arr) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (index < arr.length - 1) {
+                            document.getElementById(arr[index + 1]).focus();
+                        } else {
+                            prosesResetPassword();
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

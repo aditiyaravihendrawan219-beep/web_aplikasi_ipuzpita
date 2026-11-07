@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota Pesanan - IpuzPita MAKE UP</title>
+    <!-- Tambahkan skrip Eel agar koneksi Python aktif di halaman ini -->
+    <script type="text/javascript" src="/eel.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        body { background: #f4f4f4; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Perlebar container tombol aksi agar sejajar dengan nota */
+        .action-container {
+            width: 750px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-action {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-print {
+            background-color: #E10600;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(225, 6, 0, 0.2);
+        }
+
+        .btn-print:hover {
+            background-color: #cc0500;
+            transform: translateY(-2px);
+        }
+
+        .btn-close-tab {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-close-tab:hover {
+            background-color: #d1d5db;
+        }
+
+        /* Perbesar lebar kartu nota utama dari 600px menjadi 750px supaya lebih lega dan tidak berantakan */
+        .invoice-card { 
+            background: #fff; 
+            width: 750px; 
+            padding: 35px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            transition: all 0.3s ease;
+        }
+
+        .invoice-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid #E10600; 
+            padding-bottom: 15px; 
+            margin-bottom: 20px; 
+        }
+
+        .brand-logo { max-width: 150px; }
+        .invoice-title { text-align: right; }
+        .invoice-title h2 { color: #E10600; font-size: 24px; }
+        .invoice-title p { font-size: 12px; color: #666; }
+        .info-grid { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 20px; color: #333; }
+        
+        .table-detail { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+        .table-detail th { 
+            background: #E10600; 
+            color: #fff; 
+            text-align: left; 
+            padding: 10px 12px; 
+        }
+        .table-detail td { padding: 10px 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        
+        .total-box { background: #f9f9f9; padding: 15px; border-radius: 8px; font-size: 13px; }
+        .total-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .footer-note { text-align: center; margin-top: 25px; font-size: 11px; color: #777; }
+
+        .badge-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-block;
+        }
+
+        /* --- SKEMA TEMA WARNA DINAMIS --- */
+        .theme-lunas .invoice-header { border-bottom-color: #1E7E34 !important; }
+        .theme-lunas .invoice-title h2 { color: #1E7E34 !important; }
+        .theme-lunas .table-detail th { background-color: #1E7E34 !important; }
+        .status-lunas { background-color: #E8F6ED !important; color: #1E7E34 !important; }
+
+        .theme-dp .invoice-header { border-bottom-color: #1B55B8 !important; }
+        .theme-dp .invoice-title h2 { color: #1B55B8 !important; }
+        .theme-dp .table-detail th { background-color: #1B55B8 !important; }
+        .status-dp { background-color: #EBF3FF !important; color: #1B55B8 !important; }
+
+        .theme-menunggu .invoice-header { border-bottom-color: #B27B00 !important; }
+        .theme-menunggu .invoice-title h2 { color: #B27B00 !important; }
+        .theme-menunggu .table-detail th { background-color: #B27B00 !important; }
+        .status-menunggu { background-color: #FFF8E6 !important; color: #B27B00 !important; }
+
+        @media print {
+            body { background: none; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .action-container { display: none !important; }
+            .invoice-card { box-shadow: none !important; width: 100% !important; border: none !important; padding: 10px !important; }
+            @page { margin: 10mm; }
+        }
+
+        .table-detail { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+        .table-detail th { 
+            background: #E10600; 
+            color: #fff; 
+            padding: 10px 12px; 
+        }
+        .table-detail td { 
+            padding: 10px 12px; 
+            border-bottom: 1px solid #eee; 
+            vertical-align: middle; 
+        }
+        
+        /* Pastikan kolom Price dan Total punya ruang yang cukup dan teksnya tidak turun baris */
+        .table-detail th:nth-child(2), .table-detail td:nth-child(2) { text-align: center; width: 60px; }
+        .table-detail th:nth-child(3), .table-detail td:nth-child(3) { text-align: right; width: 120px; white-space: nowrap !important; }
+        .table-detail th:nth-child(4), .table-detail td:nth-child(4) { text-align: right; width: 130px; white-space: nowrap !important; font-weight: 600; }
+    </style>
+</head>
+<body id="bodyCard">
+
+    <!-- Tombol Aksi Mandiri Aplikasi -->
+    <div class="action-container">
+        <button class="btn-action btn-close-tab" onclick="window.location.href='buat_nota.html'">← Kembali ke Buat Nota</button>
+        <button class="btn-action btn-print" onclick="cetakUniversalPDF()">📥 Cetak / Simpan PDF</button>
+    </div>
+
+    <!-- Tampilan Kartu Nota Utama -->
+    <div class="invoice-card" id="areaCetakNota">
+        <div class="invoice-header">
+            <img src="../assets/logo_ipuzpita.png" alt="Logo IpuzPita" class="brand-logo">
+            <div class="invoice-title">
+                <h2>NOTA PESANAN</h2>
+                <p id="invNo">#INV-20261022</p>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div>
+                <strong>Kepada Yth:</strong>
+                <p id="invNamaKlien">-</p>
+                <p id="invNoHp">-</p>
+            </div>
+            <div style="text-align: right;">
+                <strong>Tanggal Acara:</strong>
+                <p id="invTanggal">-</p>
+                <strong>Lokasi:</strong>
+                <p id="invLokasi">-</p>
+            </div>
+        </div>
+
+        <!-- Tabel Detail Item dengan Kolom Qty & Unit Price -->
+        <table class="table-detail">
+            <thead>
+                <tr>
+                    <th>ITEM DESCRIPTION</th>
+                    <th style="text-align: center; width: 50px;">Qty</th>
+                    <th style="text-align: right; width: 100px;">Price</th>
+                    <th style="text-align: right; width: 100px;">Total</th>
+                </tr>
+            </thead>
+            <tbody id="invItemTableBody">
+                <!-- Data dimuat dinamis oleh JavaScript -->
+            </tbody>
+        </table>
+
+        <div class="total-box">
+            <div class="total-row">
+                <span>Status Pembayaran:</span>
+                <span id="invStatus" class="badge-status">Menunggu Pembayaran</span>
+            </div>
+            <div class="total-row" style="margin-top: 8px;">
+                <span>Jumlah Dibayar:</span>
+                <strong id="invDibayar">Rp 0</strong>
+            </div>
+            <hr style="margin: 8px 0; border: 0.5px solid #ddd;">
+            <div class="total-row" style="font-size: 15px; margin-bottom: 10px;">
+                <span>Sisa Pelunasan:</span>
+                <strong id="invSisa" style="color: #E10600;">Rp 0</strong>
+            </div>
+
+            <!-- Informasi Rekening Pembayaran BRI -->
+            <div style="background: #ffffff; border: 1px dashed #cbd5e1; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 12px; color: #334155;">
+                <p style="font-weight: bold; margin-bottom: 3px; color: #1e293b;">💳 Transfer Pembayaran ke:</p>
+                <p style="font-family: monospace; font-size: 13px; font-weight: bold; color: #E10600;">BRI: 0029-01-060708-50-7</p>
+                <p style="font-size: 11px; color: #64748b; margin-top: 2px;">a.n. Puspita Fitriyanti</p>
+            </div>
+        </div>
+
+        <!-- Bagian Tanda Tangan / Cap Berbingkai Kotak -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
+            <div style="border: 1px solid #cbd5e1; background: #fafafa; padding: 12px 20px; border-radius: 10px; text-align: center; font-size: 13px; width: 200px;">
+                <p style="margin-bottom: 6px; font-size: 11px; color: #555;">Hormat Kami,</p>
+                <img src="../assets/tanda_tangan.png" alt="Tanda Tangan" style="width: 140px; height: 65px; object-fit: contain; display: block; margin: 4px auto;" onerror="this.style.display='none'">
+                <strong style="margin-top: 6px; display: block; font-size: 12px;">IpuzPita Make Up</strong>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <p>Terima kasih telah mempercayakan momen spesial Anda kepada <strong>IpuzPita MAKE UP</strong>.</p>
+        </div>
+    </div>
+
+    <!-- Skrip Pengisian Data & Interaksi -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let rawData = localStorage.getItem('previewDataNota');
+            if (!rawData) {
+                alert("Data nota tidak ditemukan, Yang Mulia!");
+                return;
+            }
+
+            let data = JSON.parse(rawData);
+
+            // Isi Informasi Umum
+            document.getElementById('invNo').innerText = data.no_inv || '-';
+            document.getElementById('invNamaKlien').innerText = data.nama || '-';
+            document.getElementById('invNoHp').innerText = data.hp || '-';
+            document.getElementById('invTanggal').innerText = data.tanggal || '-';
+            document.getElementById('invLokasi').innerText = data.lokasi || '-';
+
+            // Status & Tema Warna Dinamis
+            let status = data.status || 'Menunggu Pembayaran';
+            let badgeEl = document.getElementById('invStatus');
+            let bodyCard = document.getElementById('bodyCard');
+
+            badgeEl.innerText = status;
+
+            if (status === 'Lunas') {
+                bodyCard.className = 'theme-lunas';
+                badgeEl.className = 'badge-status status-lunas';
+            } else if (status === 'DP Masuk') {
+                bodyCard.className = 'theme-dp';
+                badgeEl.className = 'badge-status status-dp';
+            } else {
+                bodyCard.className = 'theme-menunggu';
+                badgeEl.className = 'badge-status status-menunggu';
+            }
+
+            let total = data.total || 0;
+            let dp = data.dp || 0;
+            let dibayar = status === 'Lunas' ? total : (status === 'DP Masuk' ? dp : 0);
+            let sisa = Math.max(0, total - dibayar);
+
+            document.getElementById('invDibayar').innerText = 'Rp ' + dibayar.toLocaleString('id-ID');
+            document.getElementById('invSisa').innerText = 'Rp ' + sisa.toLocaleString('id-ID');
+
+            // Render Item Tabel Secara Dinamis (Mendukung Paket Utama, Sub-Keterangan, & Qty)
+            const tbody = document.getElementById('invItemTableBody');
+            let htmlItems = '';
+
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(item => {
+                    let subtotal = (item.harga || 0) * (item.qty || 1);
+                    if (item.tipe === 'diskon') subtotal = -Math.abs(subtotal);
+
+                    if (item.tipe === 'utama') {
+                        // Paket Utama: Tampilkan Qty dan Harga Satuan secara lengkap
+                        htmlItems += `
+                            <tr style="background-color: #fafafa; font-weight: bold;">
+                                <td style="width: 55%;"><strong>${item.nama}</strong></td>
+                                <td style="text-align: center; width: 10%;">${item.qty || 1}</td>
+                                <td style="text-align: right; width: 15%; white-space: nowrap;">Rp ${(item.harga || 0).toLocaleString('id-ID')}</td>
+                                <td style="text-align: right; width: 20%; white-space: nowrap;">Rp ${subtotal.toLocaleString('id-ID')}</td>
+                            </tr>
+                        `;
+                        let subText = item.sub || item.sub_keterangan || '';
+                        if (subText) {
+                            let subLines = subText.split('\n');
+                            subLines.forEach(line => {
+                                if (line.trim()) {
+                                    htmlItems += `
+                                        <tr>
+                                            <td colspan="4" style="padding-left: 20px; color: #555; font-size: 12px; border-bottom: 0.5px solid #f0f0f0;">
+                                                - ${line.trim()}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }
+                            });
+                        }
+                    } else {
+                        // Item Tambahan / Diskon (Lengkap dengan Qty dan Unit Price)
+                        htmlItems += `
+                            <tr>
+                                <td style="width: 55%;">${item.nama}</td>
+                                <td style="text-align: center; width: 10%;">${item.qty || 1}</td>
+                                <td style="text-align: right; width: 15%; white-space: nowrap;">Rp ${(item.harga || 0).toLocaleString('id-ID')}</td>
+                                <td style="text-align: right; width: 20%; white-space: nowrap;">Rp ${subtotal.toLocaleString('id-ID')}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            } else {
+                htmlItems += `
+                    <tr>
+                        <td colspan="3">Paket Makeup</td>
+                        <td style="text-align: right;">Rp ${total.toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            }
+
+            // Baris Total Tagihan di Bagian Bawah Tabel
+            htmlItems += `
+                <tr style="background-color: #f1f5f9; font-weight: bold;">
+                    <td colspan="3" style="text-align: right; padding: 12px 10px;">TOTAL TAGIHAN:</td>
+                    <td style="text-align: right; padding: 12px 10px; color: #E10600; white-space: nowrap;">Rp ${total.toLocaleString('id-ID')}</td>
+                </tr>
+            `;
+
+            tbody.innerHTML = htmlItems;
+        });
+
+        // Perintah Universal Print
+        function cetakUniversalPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
