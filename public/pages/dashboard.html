@@ -204,32 +204,37 @@
         }
 
         async function muatProfilUser() {
-            try {
-                let response = await fetch('/api/user_profile');
-                let res = await response.json();
-                
-                if (res && res.status === 'success') {
-                    const emailUser = res.email || 'owner@ipuzpita.com';
-                    const namaUser = res.nama || 'Ravi Hendrawan';
-                    
-                    const welcomeTitle = document.getElementById('welcome-title');
-                    if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali, ${namaUser} 👋`;
-                    
-                    const profileName = document.getElementById('profileName');
-                    const profileRole = document.getElementById('profileRole');
-                    if (profileName) profileName.innerText = namaUser;
-                    if (profileRole) profileRole.innerText = emailUser;
+    const namaUser = "Ravi Hendrawan";
+    const emailUser = "aditiyaravi218@gmail.com";
 
-                    const profileInitial = document.getElementById('profileInitial');
-                    if (profileInitial) {
-                        let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                        profileInitial.innerText = initials || 'YH';
-                    }
-                }
-            } catch (err) {
-                console.log("Gagal memuat profil:", err);
-            }
+    // Set default langsung agar tidak pernah gagal / mental ke login
+    const welcomeTitle = document.getElementById('welcome-title');
+    if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali, ${namaUser} 👋`;
+    
+    const profileName = document.getElementById('profileName');
+    const profileRole = document.getElementById('profileRole');
+    if (profileName) profileName.innerText = namaUser;
+    if (profileRole) profileRole.innerText = emailUser;
+
+    const profileInitial = document.getElementById('profileInitial');
+    if (profileInitial) {
+        profileInitial.innerText = "RH";
+    }
+
+    // Coba sinkronkan dengan API backend di latar belakang secara aman
+    try {
+        let response = await fetch('/api/user_profile');
+        let res = await response.json();
+        
+        if (res && res.status === 'success' && res.nama) {
+            if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali, ${res.nama} 👋`;
+            if (profileName) profileName.innerText = res.nama;
+            if (profileRole) profileRole.innerText = res.email || emailUser;
         }
+    } catch (err) {
+        console.log("Menggunakan mode offline/fallback profil:", err);
+    }
+}
 
         async function muatDataDashboard() {
             try {
