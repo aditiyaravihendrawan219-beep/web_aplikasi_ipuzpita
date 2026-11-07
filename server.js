@@ -50,6 +50,12 @@ async function dbQueryDual(actionCallback) {
     }
 }
 
+// Pastikan baris static di atas mendefinisikan seluruh folder utama public
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
+app.use('/pages', express.static(path.join(__dirname, 'public/pages')));
+
 // ==========================================
 // API ROUTES (TERHUBUNG KE SISTEM DUAL SUPABASE)
 // ==========================================
