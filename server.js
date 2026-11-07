@@ -8,65 +8,31 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Inisialisasi Dua Klien Supabase (Utama & Cadangan dari file .env)
-const supabaseUrlUtama = process.env.SUPABASE_URL_UTAMA || process.env.SUPABASE_URL;
-const supabaseKeyUtama = process.env.SUPABASE_ANON_KEY_UTAMA || process.env.SUPABASE_ANON_KEY;
-const supabaseUtama = createClient(supabaseUrlUtama, supabaseKeyUtama);
-
-const supabaseUrlCadangan = process.env.SUPABASE_URL_CADANGAN;
-const supabaseKeyCadangan = process.env.SUPABASE_ANON_KEY_CADANGAN;
-// Jika database cadangan belum diset di .env, fallback sementara ke utama agar tidak crash
-const supabaseCadangan = (supabaseUrlCadangan && supabaseKeyCadangan) 
-    ? createClient(supabaseUrlCadangan, supabaseKeyCadangan) 
-    : supabaseUtama;
+// Inisialisasi Supabase Utama (Clean & Direct)
+const supabaseUrl = process.env.SUPABASE_URL_UTAMA || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY_UTAMA || process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve file statis dari folder 'public'
-app.use(express.static(path.join(__dirname, 'public')));
-
 // ==========================================
-// FUNGSI PINTAR AUTOMATIC FAILOVER (DB UTAMA & BACKUP)
+// STATIC FILES ROUTING (Aman untuk Vercel)
 // ==========================================
-async function dbQueryDual(actionCallback) {
-    try {
-        // Coba jalankan operasi ke database utama dulu
-        let result = await actionCallback(supabaseUtama);
-        if (result.error) throw result.error;
-
-        // Jika operasi tulis (Insert/Upsert/Delete), sinkronkan juga secara diam-diam ke database cadangan
-        actionCallback(supabaseCadangan).catch(err => {
-            console.warn("⚠️ Peringatan Sinkronisasi ke Database Cadangan:", err.message);
-        });
-
-        return result;
-    } catch (errUtama) {
-        console.warn("⚠️ Database utama mengalami kendala, mengalihkan otomatis ke Database Cadangan...", errUtama.message);
-        // Fallback otomatis ambil/eksekusi dari database cadangan jika utama gagal total
-        let resultCadangan = await actionCallback(supabaseCadangan);
-        return resultCadangan;
-    }
-}
-
-// Pastikan baris static di atas mendefinisikan seluruh folder utama public
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 app.use('/pages', express.static(path.join(__dirname, 'public/pages')));
 
 // ==========================================
-// API ROUTES (TERHUBUNG KE SISTEM DUAL SUPABASE)
+// API ROUTES (BERSIH & TANPA RUMIT)
 // ==========================================
 
 // 1. Profil Pengguna Aktif
 app.get('/api/user_profile', async (req, res) => {
     try {
-        let { data, error } = await dbQueryDual(async (db) => {
-            return await db.from('users').select('*').order('id', { ascending: false }).limit(1);
-        });
-
+        let { data, error } = await supabase.from('users').select('*').order('id', { ascending: false }).limit(1);
         if (error || !data || data.length === 0) {
             return res.json({ status: 'success', nama: "Ravi Hendrawan", email: "aditiyaravi218@gmail.com" });
         }
@@ -86,7 +52,7 @@ app.get('/api/generate_invoice', (req, res) => {
     res.json({ invoice: `INV-${year}${month}${day}-${rand}` });
 });
 
-// 3. Login dengan Validasi Email Unik & Penanganan Error yang Kuat
+// 3. Login Endpoint
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
@@ -95,18 +61,14 @@ app.post('/api/login', async (req, res) => {
     }
 
     try {
-        let { data, error } = await dbQueryDual(async (db) => {
-            return await db.from('users').select('*').eq('email', email.trim());
-        });
+        let { data, error } = await supabase.from('users').select('*').eq('email', email.trim());
 
         if (error) throw error;
-
         if (!data || data.length === 0) {
             return res.status(401).json({ status: 'error', message: 'Email tidak terdaftar!' });
         }
 
         let validUser = data.find(user => user.password === password);
-
         if (validUser) {
             return res.json({ status: 'success', message: 'Login berhasil' });
         } else {
@@ -117,37 +79,31 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// 4. Register dengan Pengecekan Duplikat Email Terlebih Dahulu
+// 4. Register Endpoint
 app.post('/api/register', async (req, res) => {
     const { email, password, token } = req.body;
     
     if (token !== process.env.ADMIN_SECRET_TOKEN) {
         return res.status(400).json({ status: 'error', message: 'Token rahasia tidak valid!' });
     }
-
     if (!email || !password) {
         return res.status(400).json({ status: 'error', message: 'Email dan password wajib diisi!' });
     }
 
     try {
         let cleanEmail = email.trim();
-
-        let { data: existingUser } = await dbQueryDual(async (db) => {
-            return await db.from('users').select('*').eq('email', cleanEmail).maybeSingle();
-        });
+        let { data: existingUser } = await supabase.from('users').select('*').eq('email', cleanEmail).maybeSingle();
 
         if (existingUser) {
             return res.status(400).json({ status: 'error', message: 'Email sudah terdaftar!' });
         }
 
-        let { error } = await dbQueryDual(async (db) => {
-            return await db.from('users').insert([{ 
-                email: cleanEmail, 
-                password: password, 
-                nama: cleanEmail.split('@')[0], 
-                token: token 
-            }]);
-        });
+        let { error } = await supabase.from('users').insert([{ 
+            email: cleanEmail, 
+            password: password, 
+            nama: cleanEmail.split('@')[0], 
+            token: token 
+        }]);
 
         if (error) throw error;
         res.json({ status: 'success', message: 'Registrasi berhasil' });
@@ -156,12 +112,10 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// 5. Dashboard Summary & Semua Transaksi
+// 5. Dashboard Summary
 app.get('/api/dashboard_summary', async (req, res) => {
     try {
-        let { data: transaksi, error } = await dbQueryDual(async (db) => {
-            return await db.from('transaksi_nota').select('*').order('id', { ascending: false });
-        });
+        let { data: transaksi, error } = await supabase.from('transaksi_nota').select('*').order('id', { ascending: false });
         if (error) throw error;
 
         let listTrx = transaksi || [];
@@ -196,9 +150,7 @@ app.get('/api/dashboard_summary', async (req, res) => {
 
 app.get('/api/semua_riwayat', async (req, res) => {
     try {
-        let { data, error } = await dbQueryDual(async (db) => {
-            return await db.from('transaksi_nota').select('*').order('id', { ascending: false });
-        });
+        let { data, error } = await supabase.from('transaksi_nota').select('*').order('id', { ascending: false });
         if (error) throw error;
 
         let riwayatList = (data || []).map(item => ({
@@ -216,7 +168,7 @@ app.get('/api/semua_riwayat', async (req, res) => {
     }
 });
 
-// 6. Simpan / Buat / Update Nota Baru ke Supabase (Otomatis Backup)
+// 6. Simpan Nota Baru
 app.post('/api/simpan_nota_baru', async (req, res) => {
     const dataNota = req.body;
     try {
@@ -233,25 +185,20 @@ app.post('/api/simpan_nota_baru', async (req, res) => {
             items_json: JSON.stringify(dataNota.items || [])
         };
 
-        let { error } = await dbQueryDual(async (db) => {
-            return await db.from('transaksi_nota').upsert(payloadNota, { onConflict: 'no_nota' });
-        });
-
+        let { error } = await supabase.from('transaksi_nota').upsert(payloadNota, { onConflict: 'no_nota' });
         if (error) throw error;
 
-        res.json({ status: 'success', message: 'Nota berhasil disimpan ke Supabase (Utama & Backup Aman)!' });
+        res.json({ status: 'success', message: 'Nota berhasil disimpan ke Supabase!' });
     } catch (e) {
         res.status(500).json({ status: 'error', message: e.message });
     }
 });
 
-// 7. Detail Transaksi Berdasarkan Invoice (Mendukung Multi-Item JSON)
+// 7. Detail Transaksi
 app.get('/api/detail_transaksi/:inv', async (req, res) => {
     let invParam = req.params.inv.replace('#', '').trim();
     try {
-        let { data: trx, error } = await dbQueryDual(async (db) => {
-            return await db.from('transaksi_nota').select('*').or(`no_nota.eq.${invParam},no_nota.eq.#${invParam}`).maybeSingle();
-        });
+        let { data: trx, error } = await supabase.from('transaksi_nota').select('*').or(`no_nota.eq.${invParam},no_nota.eq.#${invParam}`).maybeSingle();
 
         if (error || !trx) {
             return res.status(404).json({ success: false, message: 'Transaksi tidak ditemukan' });
@@ -259,9 +206,7 @@ app.get('/api/detail_transaksi/:inv', async (req, res) => {
 
         let parsedItems = [];
         try {
-            if (trx.items_json) {
-                parsedItems = JSON.parse(trx.items_json);
-            }
+            if (trx.items_json) parsedItems = JSON.parse(trx.items_json);
         } catch (err) {
             parsedItems = [];
         }
@@ -292,16 +237,14 @@ app.get('/api/detail_transaksi/:inv', async (req, res) => {
 // 8. Rekap Keuangan & Pengeluaran
 app.get('/api/rekap_keuangan', async (req, res) => {
     try {
-        let { data: transaksi } = await dbQueryDual(async (db) => { return await db.from('transaksi_nota').select('*'); });
-        let { data: pengeluaran } = await dbQueryDual(async (db) => { return await db.from('transaksi_pengeluaran').select('*'); });
+        let { data: transaksi } = await supabase.from('transaksi_nota').select('*');
+        let { data: pengeluaran } = await supabase.from('transaksi_pengeluaran').select('*');
 
         let bulanMap = {};
-
         (transaksi || []).forEach(trx => {
             let tgl = trx.tgl_acara || trx.created_at || '2026-10-01';
             let kodeBulan = tgl.substring(0, 7);
             if (!bulanMap[kodeBulan]) bulanMap[kodeBulan] = { total_pemasukan: 0, total_pengeluaran: 0 };
-            
             let masuk = trx.status === 'Lunas' ? (parseFloat(trx.total_tagihan) || 0) : (trx.status === 'DP Masuk' ? (parseFloat(trx.nominal_dp) || 0) : 0);
             bulanMap[kodeBulan].total_pemasukan += masuk;
         });
@@ -340,9 +283,7 @@ app.get('/api/rekap_keuangan', async (req, res) => {
 app.post('/api/simpan_pengeluaran', async (req, res) => {
     const { tanggal, kategori, keterangan, nominal } = req.body;
     try {
-        let { error } = await dbQueryDual(async (db) => {
-            return await db.from('transaksi_pengeluaran').insert([{ tanggal, kategori, keterangan, nominal }]);
-        });
+        let { error } = await supabase.from('transaksi_pengeluaran').insert([{ tanggal, kategori, keterangan, nominal }]);
         if (error) throw error;
         res.json({ status: 'success', message: 'Pengeluaran berhasil dicatat!' });
     } catch (e) {
@@ -353,16 +294,12 @@ app.post('/api/simpan_pengeluaran', async (req, res) => {
 // 9. Reset Password
 app.post('/api/reset_password', async (req, res) => {
     const { email, token, password_baru } = req.body;
-
     if (token !== process.env.ADMIN_SECRET_TOKEN) {
         return res.status(400).json({ status: 'error', message: 'Token rahasia admin tidak valid!' });
     }
 
     try {
-        let { error } = await dbQueryDual(async (db) => {
-            return await db.from('users').update({ password: password_baru }).eq('email', email);
-        });
-
+        let { error } = await supabase.from('users').update({ password: password_baru }).eq('email', email);
         if (error) throw error;
         res.json({ status: 'success', message: 'Password berhasil diubah!' });
     } catch (e) {
@@ -370,87 +307,28 @@ app.post('/api/reset_password', async (req, res) => {
     }
 });
 
-// 10. Hapus Nota Transaksi Berdasarkan Invoice dari Supabase
+// 10. Hapus Nota
 app.delete('/api/hapus_nota/:inv', async (req, res) => {
     let invParam = req.params.inv.replace('#', '').trim();
     try {
-        let { data: trx, error: errSelect } = await dbQueryDual(async (db) => {
-            return await db.from('transaksi_nota').select('*').or(`no_nota.eq.${invParam},no_nota.eq.#${invParam}`).maybeSingle();
-        });
-
+        let { data: trx, error: errSelect } = await supabase.from('transaksi_nota').select('*').or(`no_nota.eq.${invParam},no_nota.eq.#${invParam}`).maybeSingle();
         if (errSelect || !trx) {
-            return res.status(404).json({ status: 'error', message: 'Nota tidak ditemukan di database.' });
+            return res.status(404).json({ status: 'error', message: 'Nota tidak ditemukan.' });
         }
 
-        let { error: errDelete } = await dbQueryDual(async (db) => {
-            return await db.from('transaksi_nota').delete().eq('no_nota', trx.no_nota);
-        });
-
+        let { error: errDelete } = await supabase.from('transaksi_nota').delete().eq('no_nota', trx.no_nota);
         if (errDelete) throw errDelete;
 
-        res.json({ status: 'success', message: 'Nota berhasil dihapus dari database!' });
+        res.json({ status: 'success', message: 'Nota berhasil dihapus!' });
     } catch (e) {
-        res.status(500).json({ status: 'error', message: 'Gagal menghapus nota: ' + e.message });
+        res.status(500).json({ status: 'error', message: 'Gagal menghapus: ' + e.message });
     }
 });
 
-// 11. Rincian Keuangan Berdasarkan Bulan Tertentu
-app.get('/api/detail_keuangan/:bulan', async (req, res) => {
-    let bulanParam = req.params.bulan; 
-    try {
-        let { data: transaksi } = await dbQueryDual(async (db) => { return await db.from('transaksi_nota').select('*'); });
-        let { data: pengeluaran } = await dbQueryDual(async (db) => { return await db.from('transaksi_pengeluaran').select('*'); });
-
-        let pemasukanBulan = (transaksi || []).filter(trx => {
-            let tgl = trx.tgl_acara || trx.created_at || '';
-            return tgl.startsWith(bulanParam);
-        }).map(trx => {
-            let nominalMasuk = trx.status === 'Lunas' ? (parseFloat(trx.total_tagihan) || 0) : (trx.status === 'DP Masuk' ? (parseFloat(trx.nominal_dp) || 0) : 0);
-            return {
-                id: trx.id,
-                no_nota: trx.no_nota,
-                nama_klien: trx.nama_klien,
-                tanggal: trx.tgl_acara,
-                status: trx.status,
-                nominal: nominalMasuk
-            };
-        });
-
-        let pengeluaranBulan = (pengeluaran || []).filter(el => {
-            let tgl = el.tanggal || '';
-            return tgl.startsWith(bulanParam);
-        }).map(el => ({
-            id: el.id,
-            tanggal: el.tanggal,
-            kategori: el.kategori,
-            keterangan: el.keterangan,
-            nominal: parseFloat(el.nominal) || 0
-        }));
-
-        let totalMasuk = pemasukanBulan.reduce((sum, item) => sum + item.nominal, 0);
-        let totalKeluar = pengeluaranBulan.reduce((sum, item) => sum + item.nominal, 0);
-
-        res.json({
-            status: 'success',
-            data: {
-                pemasukan: pemasukanBulan,
-                pengeluaran: pengeluaranBulan,
-                total_masuk: totalMasuk,
-                total_keluar: totalKeluar
-            }
-        });
-    } catch (e) {
-        res.status(500).json({ status: 'error', message: e.message });
-    }
-});
-
-// 12. Hapus Catatan Pengeluaran Berdasarkan ID
+// 11. Hapus Pengeluaran
 app.delete('/api/hapus_pengeluaran/:id', async (req, res) => {
-    let idPengeluaran = req.params.id;
     try {
-        let { error } = await dbQueryDual(async (db) => {
-            return await db.from('transaksi_pengeluaran').delete().eq('id', idPengeluaran);
-        });
+        let { error } = await supabase.from('transaksi_pengeluaran').delete().eq('id', req.params.id);
         if (error) throw error;
         res.json({ status: 'success', message: 'Pengeluaran berhasil dihapus!' });
     } catch (e) {
@@ -465,12 +343,10 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
 });
 
-// Hapus atau ganti bagian app.listen paling bawah dengan ini:
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
-        console.log(`🚀 Server berjalan di port ${PORT}`);
+        console.log(`🚀 Server lokal berjalan di port ${PORT}`);
     });
 }
 
-// Ekspor app untuk Vercel Serverless
 module.exports = app;
