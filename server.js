@@ -340,15 +340,23 @@ app.delete('/api/hapus_pengeluaran/:id', async (req, res) => {
 // FALLBACK & SERVER LISTENER
 // ==========================================
 
-// Biarkan file statis dan API berjalan normal, 
-// Fallback ini hanya untuk menangani halaman utama (root) atau error 404 jika diperlukan
+// Rute untuk Halaman Utama / Login
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'login'));
 });
 
-// Jika Anda ingin route khusus untuk dashboard:
+// Rute untuk Halaman Dashboard
 app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard.html'));
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard'));
+});
+
+// Rute opsional jika ada yang mengakses dengan ekstensi .html
+app.get('/dashboard.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard'));
+});
+
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'login'));
 });
 
 if (process.env.NODE_ENV !== 'production') {
