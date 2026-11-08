@@ -233,13 +233,25 @@
             document.getElementById('invTanggal').innerText = data.tanggal || '-';
             document.getElementById('invLokasi').innerText = data.lokasi || '-';
 
-            // Status & Tema Warna Dinamis
+            let total = data.total || 0;
+            let dp = data.dp || 0;
             let status = data.status || 'Menunggu Pembayaran';
+
+            // Logika Otomatis: Jika sisa pelunasan sudah 0, otomatis ubah status jadi Lunas
+            let dibayar = status === 'Lunas' ? total : (status === 'DP Masuk' ? dp : 0);
+            let sisa = Math.max(0, total - dibayar);
+
+            if (sisa === 0 && total > 0) {
+                status = 'Lunas';
+                dibayar = total;
+            }
+
             let badgeEl = document.getElementById('invStatus');
             let bodyCard = document.getElementById('bodyCard');
 
             badgeEl.innerText = status;
 
+            // Tema Warna Dinamis Berdasarkan Status Final
             if (status === 'Lunas') {
                 bodyCard.className = 'theme-lunas';
                 badgeEl.className = 'badge-status status-lunas';
@@ -250,11 +262,6 @@
                 bodyCard.className = 'theme-menunggu';
                 badgeEl.className = 'badge-status status-menunggu';
             }
-
-            let total = data.total || 0;
-            let dp = data.dp || 0;
-            let dibayar = status === 'Lunas' ? total : (status === 'DP Masuk' ? dp : 0);
-            let sisa = Math.max(0, total - dibayar);
 
             document.getElementById('invDibayar').innerText = 'Rp ' + dibayar.toLocaleString('id-ID');
             document.getElementById('invSisa').innerText = 'Rp ' + sisa.toLocaleString('id-ID');
