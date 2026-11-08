@@ -37,7 +37,7 @@
 
         <div class="flex flex-col gap-4 items-center">
             <a href="pengaturan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Pengaturan">⚙️</a>
-            <a href="login.html" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
+            <a href="login.html" onclick="localStorage.clear()" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
         </div>
     </aside>
 
@@ -59,13 +59,14 @@
                 </div>
             </div>
 
+            <!-- Bagian Profil (Steril dari Email Mentah) -->
             <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-2xl border border-slate-100 shadow-sm shrink-0">
                 <div class="w-7 h-7 md:w-9 md:h-9 bg-gradient-to-tr from-red-600 to-rose-400 text-white rounded-xl flex items-center justify-center font-bold text-xs md:text-sm shadow" id="profileInitial">
-                    YH
+                    YP
                 </div>
                 <div class="text-left hidden sm:block">
-                    <h4 class="text-xs font-bold text-slate-800" id="profileName">Owner</h4>
-                    <p class="text-[10px] text-slate-400" id="profileRole">Akun Aktif</p>
+                    <h4 class="text-xs font-bold text-slate-800" id="profileName">Memuat...</h4>
+                    <p class="text-[10px] text-slate-400" id="profileRole">Memuat sesi...</p>
                 </div>
             </div>
         </header>
@@ -177,7 +178,7 @@
         </div>
     </div>
 
-    <!-- Script Terpadu (Drawer Toggle & Flask Fetch API) -->
+    <!-- Script Terpadu (Satpam Sesi & Dinamis Profil) -->
     <script>
         // ==========================================
         // SATPAM PENGAMAN HALAMAN (AUTHENTICATION GUARD)
@@ -186,7 +187,7 @@
             let activeEmail = localStorage.getItem('userEmail');
             if (!activeEmail) {
                 alert("Akses ditolak! Anda belum login atau sesi telah habis. Silakan login terlebih dahulu.");
-                window.location.href = 'login.html'; // Langsung ditendang ke halaman login
+                window.location.href = 'login.html'; 
             }
         })();
         
@@ -204,7 +205,7 @@
             muatDataKeuangan();
         });
 
-        // Fungsi Buka-Tutup Sidebar Mobile (Garis Tiga)
+        // Fungsi Buka-Tutup Sidebar Mobile
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebarMenu');
             const overlay = document.getElementById('sidebarOverlay');
@@ -219,18 +220,36 @@
             }
         }
 
+        // Fungsi Memuat Profil Secara Aman (Tanpa Hardcoded Email)
         async function muatProfilUser() {
             try {
-                let response = await fetch('/api/user_profile');
+                let userEmail = localStorage.getItem('userEmail');
+                if (!userEmail) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
                 let res = await response.json();
+                
                 if (res && res.status === 'success') {
-                    document.getElementById('profileName').innerText = res.nama || 'Ravi Hendrawan';
-                    document.getElementById('profileRole').innerText = res.email || 'aditiyaravi218@gmail.com';
-                    let initials = (res.nama || 'Ravi').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                    document.getElementById('profileInitial').innerText = initials;
+                    const namaUser = res.nama || userEmail.split('@')[0];
+                    const emailUser = res.email || userEmail;
+
+                    const elName = document.getElementById('profileName');
+                    const elRole = document.getElementById('profileRole');
+                    const elAvatar = document.getElementById('profileInitial');
+
+                    if (elName) elName.innerText = namaUser;
+                    if (elRole) elRole.innerText = emailUser;
+                    
+                    if (elAvatar) {
+                        let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                        elAvatar.innerText = initials || 'YP';
+                    }
                 }
             } catch (e) {
-                console.log("Gagal memuat profil:", e);
+                console.log("Gagal memuat profil secara aman:", e);
             }
         }
 

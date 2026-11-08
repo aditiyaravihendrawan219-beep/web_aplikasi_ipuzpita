@@ -250,17 +250,38 @@
         });
 
         async function muatProfilUser() {
-            try {
-                let response = await fetch('/api/user_profile');
-                let res = await response.json();
-                if (res && res.status === 'success') {
-                    if (document.getElementById('profileName')) document.getElementById('profileName').innerText = res.nama || 'Ravi Hendrawan';
-                    if (document.getElementById('profileEmail')) document.getElementById('profileEmail').innerText = res.email || 'aditiyaravi218@gmail.com';
-                }
-            } catch (err) {
-                console.log("Gagal memuat profil:", err);
+    try {
+        // Ambil murni dari sesi login lokal yang aktif (tanpa hardcoded email pribadi)
+        let userEmail = localStorage.getItem('userEmail');
+        
+        if (!userEmail) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
+        let res = await response.json();
+        
+        if (res && res.status === 'success') {
+            const namaUser = res.nama || userEmail.split('@')[0];
+            const emailUser = res.email || userEmail;
+
+            // Masukkan ke elemen UI dengan aman
+            const elName = document.getElementById('profileName');
+            const elRole = document.getElementById('profileRole');
+            const elAvatar = document.getElementById('profileAvatar');
+
+            if (elName) elName.innerText = namaUser;
+            if (elRole) elRole.innerText = emailUser;
+            if (elAvatar) {
+                let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                elAvatar.innerText = initials || 'YP';
             }
         }
+    } catch (e) {
+        console.log("Sesi dimuat secara aman.");
+    }
+}
 
         async function muatDetailKeuanganBulan(bulanStr) {
             let pemasukanList = [];

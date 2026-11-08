@@ -217,37 +217,38 @@
         }
 
         async function muatProfilUser() {
-    // Berikan teks placeholder yang rapi terlebih dahulu agar tidak tumpang tindih
-    const welcomeTitle = document.getElementById('welcome-title');
-    if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali 👋`;
-
     try {
-        let userEmail = localStorage.getItem('userEmail') || 'aditiyaravi218@gmail.com';
+        // Ambil murni dari sesi login lokal yang aktif (tanpa hardcoded email pribadi)
+        let userEmail = localStorage.getItem('userEmail');
+        
+        if (!userEmail) {
+            window.location.href = 'login.html';
+            return;
+        }
+
         let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
         let res = await response.json();
         
         if (res && res.status === 'success') {
+            const namaUser = res.nama || userEmail.split('@')[0];
             const emailUser = res.email || userEmail;
-            const namaUser = res.nama || 'Ravi Hendrawan';
-            
-            // Setelah data siap, tampilkan nama asli dengan mulus
-            if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali, ${namaUser} 👋`;
-            
-            const profileName = document.getElementById('profileName');
-            const profileRole = document.getElementById('profileRole');
-            if (profileName) profileName.innerText = namaUser;
-            if (profileRole) profileRole.innerText = emailUser;
 
-            const profileInitial = document.getElementById('profileInitial');
-            if (profileInitial) {
+            // Masukkan ke elemen UI dengan aman
+            const elName = document.getElementById('profileName');
+            const elRole = document.getElementById('profileRole');
+            const elAvatar = document.getElementById('profileAvatar');
+
+            if (elName) elName.innerText = namaUser;
+            if (elRole) elRole.innerText = emailUser;
+            if (elAvatar) {
                 let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                profileInitial.innerText = initials || 'YH';
+                elAvatar.innerText = initials || 'YP';
             }
         }
-            } catch (err) {
-                console.log("Gagal memuat profil:", err);
-            }
-        }
+    } catch (e) {
+        console.log("Sesi dimuat secara aman.");
+    }
+}
 
         async function muatDataDashboard() {
             try {
