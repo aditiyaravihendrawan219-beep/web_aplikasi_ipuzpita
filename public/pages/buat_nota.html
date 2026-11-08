@@ -469,12 +469,23 @@
                 sisa: parseNominal(document.getElementById('summarySisa').innerText)
             };
 
+            // Buat atau ambil token sesi unik acak yang aman secara lokal (tanpa email pribadi)
+            let userSessionToken = localStorage.getItem('userSessionToken');
+            if (!userSessionToken) {
+                userSessionToken = 'session_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                localStorage.setItem('userSessionToken', userSessionToken);
+            }
+
             try {
-                let res = await (await fetch('/api/simpan_nota_baru', {
+                let response = await fetch('/api/simpan_nota_baru', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-user-auth': userSessionToken // <-- Kirim token sesi acak yang aman
+                    },
                     body: JSON.stringify(data)
-                })).json();
+                });
+                let res = await response.json();
 
                 if (res.status === 'success') {
                     showToast("Berhasil!", "Nota berhasil disimpan ke database!", "success");
