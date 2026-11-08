@@ -58,17 +58,28 @@ async function dbQueryDual(actionCallback) {
 // API ROUTES (DENGAN DUAL SUPABASE)
 // ==========================================
 
-// 1. Profil Pengguna Aktif
+// 1. Profil Pengguna Aktif Berdasarkan Email yang Login (DIJAMIN TIDAK TERTUKAR)
 app.get('/api/user_profile', async (req, res) => {
     try {
-        let { data, error } = await dbQueryDual(async (db) => {
-            return await db.from('users').select('*').order('id', { ascending: false }).limit(1);
-        });
-
-        if (error || !data || data.length === 0) {
+        let emailUser = req.query.email; // Menangkap email spesifik dari browser pengguna
+        
+        if (!emailUser) {
             return res.json({ status: 'success', nama: "Ravi Hendrawan", email: "aditiyaravi218@gmail.com" });
         }
-        res.json({ status: 'success', nama: data[0].nama || 'Admin', email: data[0].email });
+
+        let { data, error } = await dbQueryDual(async (db) => {
+            return await db.from('users').select('*').eq('email', emailUser).maybeSingle();
+        });
+
+        if (error || !data) {
+            return res.json({ status: 'success', nama: emailUser.split('@')[0], email: emailUser });
+        }
+
+        res.json({ 
+            status: 'success', 
+            nama: data.nama || data.email.split('@')[0], 
+            email: data.email 
+        });
     } catch (e) {
         res.json({ status: 'success', nama: "Ravi Hendrawan", email: "aditiyaravi218@gmail.com" });
     }
