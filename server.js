@@ -336,27 +336,28 @@ app.delete('/api/hapus_pengeluaran/:id', async (req, res) => {
     }
 });
 
-// ==========================================
-// FALLBACK & SERVER LISTENER
+/// ==========================================
+// FALLBACK & SERVER LISTENER (All Pages Router)
 // ==========================================
 
-// Rute untuk Halaman Utama / Login
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
 });
 
-// Rute untuk Halaman Dashboard
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard.html'));
 });
 
-// Rute opsional untuk ekstensi .html
-app.get('/dashboard.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard.html'));
-});
+// Daftar rute otomatis untuk semua halaman pendukung di dalam folder public/pages/
+const daftarHalaman = ['buat_nota', 'riwayat', 'keuangan', 'pengaturan', 'edit_nota', 'detail_bulan', 'dp_masuk', 'lunas', 'menunggu_dp', 'nota_template'];
 
-app.get('/login.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
+daftarHalaman.forEach(namaHalaman => {
+    app.get(`/${namaHalaman}`, (req, res) => {
+        res.sendFile(path.join(__dirname, 'public', 'pages', `${namaHalaman}.html`));
+    });
+    app.get(`/${namaHalaman}.html`, (req, res) => {
+        res.sendFile(path.join(__dirname, 'public', 'pages', `${namaHalaman}.html`));
+    });
 });
 
 if (process.env.NODE_ENV !== 'production') {
