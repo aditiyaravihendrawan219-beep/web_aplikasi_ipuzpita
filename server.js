@@ -34,6 +34,28 @@ app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 app.use('/pages', express.static(path.join(__dirname, 'public/pages')));
 
 // ==========================================
+// SATPAM MIDDLEWARE KEAMANAN BACKEND API
+// ==========================================
+function authMiddleware(req, res, next) {
+    // Memeriksa apakah request membawa header identitas/token akses yang sah
+    let clientAuth = req.headers['x-user-auth'] || req.query.email;
+    
+    // Untuk rute publik seperti login dan register, izinkan lewat
+    if (req.path === '/api/login' || req.path === '/api/register' || req.path === '/api/reset_password' || req.path === '/api/generate_invoice') {
+        return next();
+    }
+
+    // Jika mencoba akses API tanpa identitas user yang valid, tolak mentah-mentah
+    if (!clientAuth) {
+        return res.status(401).json({ status: 'error', message: 'Akses ditolak! Sesi tidak valid atau tidak diizinkan.' });
+    }
+    
+    next();
+}
+
+app.use('/api', authMiddleware);
+
+// ==========================================
 // FUNGSI PINTAR AUTOMATIC FAILOVER DUAL DB
 // ==========================================
 async function dbQueryDual(actionCallback) {
@@ -55,13 +77,13 @@ async function dbQueryDual(actionCallback) {
 }
 
 // ==========================================
-// API ROUTES (DENGAN DUAL SUPABASE)
+// API ROUTES (DENGAN DUAL SUPABASE & SECURITY)
 // ==========================================
 
-// 1. Profil Pengguna Aktif Berdasarkan Email yang Login (DIJAMIN TIDAK TERTUKAR)
+// 1. Profil Pengguna Aktif Berdasarkan Email yang Login
 app.get('/api/user_profile', async (req, res) => {
     try {
-        let emailUser = req.query.email; // Menangkap email spesifik dari browser pengguna
+        let emailUser = req.query.email || req.headers['x-user-auth'];
         
         if (!emailUser) {
             return res.json({ status: 'success', nama: "Ravi Hendrawan", email: "aditiyaravi218@gmail.com" });
@@ -399,7 +421,7 @@ app.delete('/api/hapus_pengeluaran/:id', async (req, res) => {
         if (error) throw error;
         res.json({ status: 'success', message: 'Pengeluaran berhasil dihapus!' });
     } catch (e) {
-        res.status(500).json({ status: 'error', message: e.message });
+        res.status(500).json({ status: 'error', message: 'Gagal menghapus: ' + e.message });
     }
 });
 

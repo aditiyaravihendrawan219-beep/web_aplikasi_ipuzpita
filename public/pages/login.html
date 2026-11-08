@@ -79,7 +79,7 @@
                     <a href="#" class="text-[11px] text-slate-700 hover:text-red-600" onclick="bukaModalReset()">Forgot Password?</a>
                 </div>
 
-                <button type="button" class="w-[140px] py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xs shadow-lg shadow-red-600/30 mx-auto block" onclick="prosesLogin()">
+                <button type="button" id="btnLoginSubmit" class="w-[140px] py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xs shadow-lg shadow-red-600/30 mx-auto block transition-all" onclick="prosesLogin()">
                     SIGN IN
                 </button>
 
@@ -116,7 +116,7 @@
                 <input type="password" id="signupToken" placeholder="Token Rahasia" required
                     class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 outline-none transition-all">
 
-                <button type="button" class="w-[140px] py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xs shadow-lg shadow-red-600/30 mx-auto block mt-2" onclick="prosesRegister()">
+                <button type="button" id="btnRegisterSubmit" class="w-[140px] py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xs shadow-lg shadow-red-600/30 mx-auto block mt-2 transition-all" onclick="prosesRegister()">
                     SIGN UP
                 </button>
 
@@ -171,8 +171,20 @@
         </div>
     </div>
 
-    <!-- SCRIPT INTERAKSI -->
+    <!-- SCRIPT INTERAKSI & PENGAMAN LOGIN -->
     <script>
+        // ==========================================
+        // 1. SATPAM PENGAMAN HALAMAN LOGIN (ANTI-BYPASS)
+        // ==========================================
+        (function() {
+            // Jika user sudah memiliki sesi aktif, jangan biarkan nongkrong di halaman login
+            let activeEmail = localStorage.getItem('userEmail');
+            if (activeEmail) {
+                // Opsional: Langsung arahkan ke dashboard jika sudah login
+                // window.location.href = '/dashboard';
+            }
+        })();
+
         function toggleAuthMode() {
             const card = document.getElementById('loginCard');
             card.classList.toggle('active-signup');
@@ -211,14 +223,26 @@
             }, 3000);
         }
 
+        // ==========================================
+        // 2. PROSES LOGIN DENGAN PENGAMAN ANTI-SPAM
+        // ==========================================
         async function prosesLogin() {
-            let email = document.getElementById('loginEmail').value.trim();
-            let password = document.getElementById('loginPassword').value;
+            let emailInput = document.getElementById('loginEmail');
+            let passwordInput = document.getElementById('loginPassword');
+            let btnSubmit = document.getElementById('btnLoginSubmit');
+
+            let email = emailInput.value.trim();
+            let password = passwordInput.value;
 
             if (!email || !password) {
                 showToast("Peringatan", "Email dan password wajib diisi!", "error");
                 return;
             }
+
+            // Kunci tombol untuk mencegah spam klik (Rate Limiting Client-Side)
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "Memproses...";
+            btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
 
             try {
                 let response = await fetch('/api/login', {
@@ -236,13 +260,24 @@
                     }, 1200);
                 } else {
                     showToast("Login Gagal", res.message || "Email atau password salah!", "error");
+                    // Buka kembali tombol jika gagal
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerText = "SIGN IN";
+                    btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
             } catch (e) {
                 showToast("Kesalahan Sistem", "Gagal terhubung ke server!", "error");
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "SIGN IN";
+                btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 
+        // ==========================================
+        // 3. PROSES REGISTER DENGAN PENGAMAN ANTI-SPAM
+        // ==========================================
         async function prosesRegister() {
+            let btnRegister = document.getElementById('btnRegisterSubmit');
             let email = document.getElementById('signupEmail').value.trim();
             let password = document.getElementById('signupPassword').value;
             let token = document.getElementById('signupToken').value.trim();
@@ -251,6 +286,10 @@
                 showToast("Peringatan", "Semua kolom pendaftaran wajib diisi!", "error");
                 return;
             }
+
+            btnRegister.disabled = true;
+            btnRegister.innerText = "Memproses...";
+            btnRegister.classList.add('opacity-50', 'cursor-not-allowed');
 
             try {
                 let response = await fetch('/api/register', {
@@ -262,12 +301,23 @@
 
                 if (res && res.status === 'success') {
                     showToast("Registrasi Berhasil!", "Silakan login menggunakan akun baru.");
-                    setTimeout(() => toggleAuthMode(), 1500);
+                    setTimeout(() => {
+                        toggleAuthMode();
+                        btnRegister.disabled = false;
+                        btnRegister.innerText = "SIGN UP";
+                        btnRegister.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }, 1500);
                 } else {
                     showToast("Registrasi Gagal", res.message || "Terjadi kesalahan.", "error");
+                    btnRegister.disabled = false;
+                    btnRegister.innerText = "SIGN UP";
+                    btnRegister.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
             } catch (e) {
                 showToast("Kesalahan Sistem", "Gagal terhubung ke server!", "error");
+                btnRegister.disabled = false;
+                btnRegister.innerText = "SIGN UP";
+                btnRegister.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
 

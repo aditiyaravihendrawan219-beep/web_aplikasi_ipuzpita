@@ -161,6 +161,17 @@
 
     <!-- Script Terpadu -->
     <script>
+        // ==========================================
+        // SATPAM PENGAMAN HALAMAN (AUTHENTICATION GUARD)
+        // ==========================================
+        (function() {
+            let activeEmail = localStorage.getItem('userEmail');
+            if (!activeEmail) {
+                alert("Akses ditolak! Anda belum login atau sesi telah habis. Silakan login terlebih dahulu.");
+                window.location.href = 'login.html'; // Langsung ditendang ke halaman login
+            }
+        })();
+        
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             let rawInv = urlParams.get('inv') || urlParams.get('no_inv') || localStorage.getItem('selectedInvoiceNo');

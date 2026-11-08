@@ -219,15 +219,33 @@
     </div>
 
     <!-- Skrip Pengisian Data & Interaksi -->
+    <!-- Skrip Pengisian Data & Interaksi -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // ==========================================
+        // SATPAM PENGAMAN HALAMAN & DATA NOTA
+        // ==========================================
+        (function() {
+            let activeEmail = localStorage.getItem('userEmail');
             let rawData = localStorage.getItem('previewDataNota');
-            if (!rawData) {
-                alert("Data nota tidak ditemukan, Yang Mulia!");
+            
+            if (!activeEmail) {
+                alert("Akses ditolak! Anda belum login.");
+                window.location.href = 'login.html';
                 return;
             }
+            if (!rawData) {
+                alert("Data nota tidak ditemukan atau akses tidak sah, Yang Mulia!");
+                window.location.href = 'dashboard.html';
+                return;
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            let rawData = localStorage.getItem('previewDataNota');
+            if (!rawData) return; // Sudah dicegah di atas
 
             let data = JSON.parse(rawData);
+            // ... (lanjutan skrip bawaan seterusnya)
 
             // Isi Informasi Umum
             document.getElementById('invNo').innerText = data.no_inv || '-';

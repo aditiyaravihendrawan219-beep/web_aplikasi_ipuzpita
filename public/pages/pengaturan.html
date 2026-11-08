@@ -178,6 +178,17 @@
 
     <!-- Script Kustom Toast & Logika Pengaturan -->
     <script>
+        // ==========================================
+        // SATPAM PENGAMAN HALAMAN (AUTHENTICATION GUARD)
+        // ==========================================
+        (function() {
+            let activeEmail = localStorage.getItem('userEmail');
+            if (!activeEmail) {
+                alert("Akses ditolak! Anda belum login atau sesi telah habis. Silakan login terlebih dahulu.");
+                window.location.href = 'login.html'; // Langsung ditendang ke halaman login
+            }
+        })();
+        
         document.addEventListener('DOMContentLoaded', function() {
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const todayStr = new Date().toLocaleDateString('id-ID', options);

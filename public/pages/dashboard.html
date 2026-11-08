@@ -172,8 +172,21 @@
 
     </main>
 
+    
+
     <!-- Skrip JavaScript Terpadu & Multi-User Profile Safe -->
     <script>
+        // ==========================================
+        // SATPAM PENGAMAN HALAMAN (AUTHENTICATION GUARD)
+        // ==========================================
+        (function() {
+            let activeEmail = localStorage.getItem('userEmail');
+            if (!activeEmail) {
+                alert("Akses ditolak! Anda belum login atau sesi telah habis. Silakan login terlebih dahulu.");
+                window.location.href = 'login.html'; // Langsung ditendang ke halaman login
+            }
+        })();
+
         let semuaTransaksiCache = [];
         let today = new Date();
         let currentMonth = today.getMonth();
