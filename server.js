@@ -59,8 +59,7 @@ function authMiddleware(req, res, next) {
 }
 
 app.use('/api', authMiddleware);
-
-app.use('/api', authMiddleware);
+    
 
 // ==========================================
 // FUNGSI PINTAR AUTOMATIC FAILOVER DUAL DB
