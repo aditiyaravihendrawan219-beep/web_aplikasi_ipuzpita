@@ -16,37 +16,62 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        /* Transisi Sliding Kartu Utama */
+        .login-card {
+            position: relative;
+            width: 960px;
+            height: 540px;
+            background: #ffffff;
+            border-radius: 24px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        .form-left, .form-signup-container, .banner-right {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .form-left { left: 0; padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; background: white; }
+        .form-signup-container { right: 0; padding: 40px; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; z-index: 5; background: white; }
+        .banner-right { right: 0; background-color: #E10600; border-top-left-radius: 180px; border-bottom-left-radius: 180px; display: flex; flex-direction: column; padding-top: 65px; padding-left: 50px; color: white; overflow: hidden; z-index: 20; }
+        
+        /* State saat aktif Sign Up */
+        .login-card.active-signup .form-left { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+        .login-card.active-signup .banner-right { transform: translateX(-100%); border-radius: 0 24px 24px 0; padding-top: 40px; z-index: 20; }
+        .login-card.active-signup .form-signup-container { opacity: 1; pointer-events: auto; z-index: 15; }
+        .login-card.active-signup .img-signin { display: none !important; }
+        .login-card.active-signup .img-signup { display: block !important; }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen bg-slate-100 p-4 overflow-y-auto">
+<body class="flex items-center justify-center min-h-screen bg-slate-100 p-4">
 
-    <!-- Kartu Utama Login / Sign Up (Migrasi Total ke Tailwind) -->
-    <div class="relative w-full max-w-[960px] min-h-[540px] bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden animate-fade-in transition-all duration-700" id="loginCard">
+    <!-- Kartu Utama -->
+    <div class="login-card animate-fade-in" id="loginCard">
         
-        <!-- 1. FORM SIGN IN (Sisi Kiri di Desktop, Atas di Mobile) -->
-        <div class="absolute left-0 top-0 w-full md:w-1/2 h-full p-8 md:p-12 flex flex-col justify-center items-center text-center transition-all duration-600 z-10 bg-white" id="signInFormContainer">
-            
-            <!-- Logo & Judul Rata Tengah -->
-            <img src="../assets/logo_ipuzpita.png" alt="Logo" class="w-36 md:w-40 object-contain mb-4">
-            <p class="text-xs text-slate-500 mb-6 font-medium">Sign in With Email & Password</p>
+        <!-- 1. FORM SIGN IN (Kiri) -->
+        <div class="form-left text-center">
+            <img src="../assets/logo_ipuzpita.png" alt="Logo" class="w-36 object-contain mb-3">
+            <p class="text-xs text-slate-500 mb-5 font-medium">Sign in With Email & Password</p>
 
             <div class="w-full max-w-[280px] space-y-3">
-                <div class="relative">
-                    <input type="email" id="loginEmail" placeholder="Masukkan Email (@gmail.com)" required
-                        class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none transition-all">
-                </div>
+                <input type="email" id="loginEmail" placeholder="Masukkan Email (@gmail.com)" required
+                    class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 outline-none transition-all">
 
                 <div class="relative flex items-center">
                     <input type="password" id="loginPassword" placeholder="Password" required
-                        class="w-full px-4 py-3 pr-10 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none transition-all">
-                    <span class="absolute right-4 cursor-pointer text-xs select-none opacity-60 hover:opacity-100 transition-opacity" onclick="togglePasswordVisibility('loginPassword', this)">👁️</span>
+                        class="w-full px-4 py-3 pr-10 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 outline-none transition-all">
+                    <span class="absolute right-4 cursor-pointer text-xs select-none opacity-60 hover:opacity-100" onclick="togglePasswordVisibility('loginPassword', this)">👁️</span>
                 </div>
 
                 <div class="flex justify-end pr-2">
-                    <a href="#" class="text-[11px] text-slate-700 hover:text-red-600 transition-colors" onclick="bukaModalReset()">Forgot Password?</a>
+                    <a href="#" class="text-[11px] text-slate-700 hover:text-red-600" onclick="bukaModalReset()">Forgot Password?</a>
                 </div>
 
-                <button type="button" class="w-[140px] py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xs shadow-lg shadow-red-600/30 hover:-translate-y-0.5 transition-all mx-auto block" onclick="prosesLogin()">
+                <button type="button" class="w-[140px] py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xs shadow-lg shadow-red-600/30 mx-auto block" onclick="prosesLogin()">
                     SIGN IN
                 </button>
 
@@ -56,38 +81,34 @@
             </div>
         </div>
 
-        <!-- 2. BANNER KANAN (Kurva Merah & Ilustrasi Asli) -->
-        <div class="hidden md:flex absolute right-0 top-0 w-1/2 h-full bg-red-600 rounded-l-[180px] flex-col justify-start pt-16 pl-14 text-white overflow-hidden z-25 transition-all duration-600" id="bannerRight">
-            <h2 class="text-3xl font-bold leading-tight text-left z-20 img-signin">Selamat Datang<br>Kembali</h2>
-            <h2 class="text-3xl font-bold leading-tight text-left z-20 img-signup" style="display: none;">Mulai Bergabung<br>Bersama Kami</h2>
+        <!-- 2. BANNER KANAN (Kurva Merah & Ilustrasi) -->
+        <div class="banner-right text-left" id="bannerRight">
+            <h2 class="text-3xl font-bold leading-tight z-20 img-signin">Selamat Datang<br>Kembali</h2>
+            <h2 class="text-3xl font-bold leading-tight z-20 img-signup" style="display: none;">Mulai Bergabung<br>Bersama Kami</h2>
             
-            <img src="../assets/ilustrasi_2.png" alt="Ilustrasi" class="absolute -bottom-5 -right-5 w-[480px] h-auto pointer-events-none z-10 img-signin animate-bounce duration-1000">
-            <img src="../assets/ilustrasi_1.png" alt="Ilustrasi Sign Up" class="absolute -bottom-10 right-9 w-[440px] h-auto pointer-events-none z-10 img-signup" style="display: none;">
+            <img src="../assets/ilustrasi_2.png" alt="Ilustrasi" class="absolute -bottom-5 -right-5 w-[460px] h-auto pointer-events-none z-10 img-signin">
+            <img src="../assets/ilustrasi_1.png" alt="Ilustrasi Sign Up" class="absolute -bottom-10 right-8 w-[420px] h-auto pointer-events-none z-10 img-signup" style="display: none;">
         </div>
 
-        <!-- 3. FORM SIGN UP (Tersembunyi, Muncul saat Sliding Aktif) -->
-        <div class="absolute right-0 top-0 w-full md:w-1/2 h-full p-8 md:p-12 flex flex-col justify-center items-center text-center opacity-0 pointer-events-none transition-all duration-600 z-5 bg-white" id="signUpFormContainer">
+        <!-- 3. FORM SIGN UP (Kanan Tersembunyi) -->
+        <div class="form-signup-container text-center">
             <h3 class="text-lg font-bold text-slate-900 mb-1">Buat Akun Baru</h3>
-            <p class="text-xs text-slate-500 mb-6 font-medium">Daftar dengan Token Rahasia Admin</p>
+            <p class="text-xs text-slate-500 mb-5 font-medium">Daftar dengan Token Rahasia Admin</p>
 
             <div class="w-full max-w-[280px] space-y-3">
-                <div>
-                    <input type="email" id="signupEmail" placeholder="Email (@gmail.com)" required
-                        class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none transition-all">
-                </div>
+                <input type="email" id="signupEmail" placeholder="Email (@gmail.com)" required
+                    class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 outline-none transition-all">
 
                 <div class="relative flex items-center">
                     <input type="password" id="signupPassword" placeholder="Password Baru" required
-                        class="w-full px-4 py-3 pr-10 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none transition-all">
-                    <span class="absolute right-4 cursor-pointer text-xs select-none opacity-60 hover:opacity-100 transition-opacity" onclick="togglePasswordVisibility('signupPassword', this)">👁️</span>
+                        class="w-full px-4 py-3 pr-10 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 outline-none transition-all">
+                    <span class="absolute right-4 cursor-pointer text-xs select-none opacity-60 hover:opacity-100" onclick="togglePasswordVisibility('signupPassword', this)">👁️</span>
                 </div>
 
-                <div>
-                    <input type="password" id="signupToken" placeholder="Token Rahasia" required
-                        class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 focus:ring-2 focus:ring-red-600/20 outline-none transition-all">
-                </div>
+                <input type="password" id="signupToken" placeholder="Token Rahasia" required
+                    class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 outline-none transition-all">
 
-                <button type="button" class="w-[140px] py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xs shadow-lg shadow-red-600/30 hover:-translate-y-0.5 transition-all mx-auto block mt-2" onclick="prosesRegister()">
+                <button type="button" class="w-[140px] py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full text-xs shadow-lg shadow-red-600/30 mx-auto block mt-2" onclick="prosesRegister()">
                     SIGN UP
                 </button>
 
@@ -109,28 +130,19 @@
             <p class="text-xs text-slate-500 mb-6">Masukkan email akun Anda, Token Rahasia Admin, dan kata sandi baru untuk mereset akun.</p>
 
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email Terdaftar</label>
-                    <input type="email" id="resetEmail" placeholder="Email Terdaftar (@gmail.com)" required 
-                        class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-600">
-                </div>
+                <input type="email" id="resetEmail" placeholder="Email Terdaftar (@gmail.com)" required 
+                    class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-600">
                 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Token Rahasia Admin</label>
-                    <div class="relative">
-                        <input type="password" id="resetToken" placeholder="Token Rahasia Admin" required 
-                            class="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-600">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer select-none text-sm" onclick="togglePasswordVisibility('resetToken', this)">👁️</span>
-                    </div>
+                <div class="relative">
+                    <input type="password" id="resetToken" placeholder="Token Rahasia Admin" required 
+                        class="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-600">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-sm select-none" onclick="togglePasswordVisibility('resetToken', this)">👁️</span>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Password Baru</label>
-                    <div class="relative">
-                        <input type="password" id="resetPasswordBaru" placeholder="Password Baru" required 
-                            class="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-600">
-                        <span class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer select-none text-sm" onclick="togglePasswordVisibility('resetPasswordBaru', this)">👁️</span>
-                    </div>
+                <div class="relative">
+                    <input type="password" id="resetPasswordBaru" placeholder="Password Baru" required 
+                        class="w-full px-4 py-3 pr-12 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-600">
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-sm select-none" onclick="togglePasswordVisibility('resetPasswordBaru', this)">👁️</span>
                 </div>
 
                 <button type="button" onclick="prosesResetPassword()" class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-red-500/30">
@@ -151,58 +163,11 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIKA ANIMASI & API -->
+    <!-- SCRIPT INTERAKSI -->
     <script>
         function toggleAuthMode() {
             const card = document.getElementById('loginCard');
-            const formLeft = document.getElementById('signInFormContainer');
-            const bannerRight = document.getElementById('bannerRight');
-            const formSignup = document.getElementById('signUpFormContainer');
-            const imgSignin = document.querySelectorAll('.img-signin');
-            const imgSignup = document.querySelectorAll('.img-signup');
-
-            // Toggle kelas transisi manual mirip style.css lama
-            if (!card.classList.contains('active-signup')) {
-                card.classList.add('active-signup');
-                formLeft.style.transform = 'translateX(-100%)';
-                formLeft.style.opacity = '0';
-                formLeft.style.pointerEvents = 'none';
-
-                bannerRight.style.transform = 'translateX(-100%)';
-                bannerRight.style.borderRadius = '0 24px 24px 0';
-                bannerRight.style.paddingTop = '40px';
-                bannerRight.style.zIndex = '20';
-
-                formSignup.style.opacity = '1';
-                formSignup.style.pointerEvents = 'auto';
-                formSignup.style.zIndex = '10';
-
-                imgSignin.forEach(el => el.style.display = 'none');
-                imgSignup.forEach(el => {
-                    el.style.display = 'block';
-                    el.style.position = 'absolute';
-                    el.style.bottom = '-45px';
-                    el.style.right = '35px';
-                    el.style.width = '440px';
-                });
-            } else {
-                card.classList.remove('active-signup');
-                formLeft.style.transform = 'translateX(0)';
-                formLeft.style.opacity = '1';
-                formLeft.style.pointerEvents = 'auto';
-
-                bannerRight.style.transform = 'translateX(0)';
-                bannerRight.style.borderRadius = '24px 0 0 24px';
-                bannerRight.style.paddingTop = '64px';
-                bannerRight.style.zIndex = '25';
-
-                formSignup.style.opacity = '0';
-                formSignup.style.pointerEvents = 'none';
-                formSignup.style.zIndex = '5';
-
-                imgSignin.forEach(el => el.style.display = 'block');
-                imgSignup.forEach(el => el.style.display = 'none');
-            }
+            card.classList.toggle('active-signup');
         }
 
         function togglePasswordVisibility(fieldId, iconEl) {
