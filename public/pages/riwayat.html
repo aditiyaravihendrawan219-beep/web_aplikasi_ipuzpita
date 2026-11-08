@@ -408,13 +408,25 @@
         async function eksekusiHapusPermanen(invoiceNo) {
             tutupModalKonfirmasi();
 
+            // Ambil token sesi unik acak yang aman
+            let userSessionToken = localStorage.getItem('userSessionToken');
+            if (!userSessionToken) {
+                userSessionToken = 'session_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+                localStorage.setItem('userSessionToken', userSessionToken);
+            }
+
             try {
-                let response = await fetch(`/api/hapus_nota/${invoiceNo}`, { method: 'DELETE' });
+                let response = await fetch(`/api/hapus_nota/${invoiceNo}`, { 
+                    method: 'DELETE',
+                    headers: {
+                        'x-user-auth': userSessionToken // <-- Kirim token satpam di sini
+                    }
+                });
                 let res = await response.json();
                 
                 if (res && res.status === 'success') {
                     showToast("Berhasil!", "Transaksi #" + invoiceNo + " berhasil dihapus.");
-                    muatTabelRiwayat(); // Muat ulang tabel otomatis
+                    muatTabelRiwayat(); 
                 } else {
                     showToast("Gagal!", res.message || "Gagal menghapus nota.", "error");
                 }

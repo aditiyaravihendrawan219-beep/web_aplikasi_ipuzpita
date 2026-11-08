@@ -39,7 +39,7 @@ app.use('/pages', express.static(path.join(__dirname, 'public/pages')));
 function authMiddleware(req, res, next) {
     const urlLengkap = req.originalUrl || req.url;
 
-    // IZINKAN SEMUA RUTE PUBLIK & API UTAMA AGAR TIDAK TERKENA 401
+    // IZINKAN RUTE PUBLIK & API UTAMA TERMASUK HAPUS NOTA
     if (
         urlLengkap.includes('/api/login') || 
         urlLengkap.includes('/api/register') || 
@@ -49,12 +49,13 @@ function authMiddleware(req, res, next) {
         urlLengkap.includes('/api/dashboard_summary') ||
         urlLengkap.includes('/api/semua_riwayat') ||
         urlLengkap.includes('/api/simpan_nota_baru') ||
-        urlLengkap.includes('/api/rekap_keuangan')
+        urlLengkap.includes('/api/rekap_keuangan') ||
+        urlLengkap.includes('/api/hapus_nota')
     ) {
         return next();
     }
 
-    let clientAuth = req.headers['x-user-auth'] || req.query.email || req.query.token;
+    let clientAuth = req.headers['x-user-auth'] || req.query.token || req.query.email;
 
     if (!clientAuth) {
         return res.status(401).json({ status: 'error', message: 'Akses ditolak! Sesi tidak valid.' });
@@ -62,8 +63,6 @@ function authMiddleware(req, res, next) {
     
     next();
 }
-
-app.use('/api', authMiddleware);
 
 // ==========================================
 // FUNGSI PINTAR AUTOMATIC FAILOVER DUAL DB
