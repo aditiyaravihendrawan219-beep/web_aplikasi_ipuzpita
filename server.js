@@ -37,21 +37,28 @@ app.use('/pages', express.static(path.join(__dirname, 'public/pages')));
 // SATPAM MIDDLEWARE KEAMANAN BACKEND API
 // ==========================================
 function authMiddleware(req, res, next) {
-    // Memeriksa apakah request membawa header identitas/token akses yang sah
-    let clientAuth = req.headers['x-user-auth'] || req.query.email;
-    
-    // Untuk rute publik seperti login dan register, izinkan lewat
-    if (req.path === '/api/login' || req.path === '/api/register' || req.path === '/api/reset_password' || req.path === '/api/generate_invoice') {
+    // IZINKAN SEMUA RUTE LOGIN, REGISTER, RESET PASSWORD, DAN FILE STATIS UNTUK LEWAT TANPA SESI
+    if (
+        req.path.startsWith('/api/login') || 
+        req.path.startsWith('/api/register') || 
+        req.path.startsWith('/api/reset_password') || 
+        req.path.startsWith('/api/generate_invoice') ||
+        req.path.startsWith('/api/user_profile')
+    ) {
         return next();
     }
 
-    // Jika mencoba akses API tanpa identitas user yang valid, tolak mentah-mentah
+    let clientAuth = req.headers['x-user-auth'] || req.query.email;
+
+    // Jika mencoba akses API data sensitif tanpa identitas user, tolak
     if (!clientAuth) {
         return res.status(401).json({ status: 'error', message: 'Akses ditolak! Sesi tidak valid atau tidak diizinkan.' });
     }
     
     next();
 }
+
+app.use('/api', authMiddleware);
 
 app.use('/api', authMiddleware);
 
