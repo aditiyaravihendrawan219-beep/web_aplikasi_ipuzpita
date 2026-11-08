@@ -31,7 +31,7 @@
         </div>
 
         <div class="hidden md:flex flex-col gap-4 items-center">
-            <a href="login.html" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
+            <a href="login.html" onclick="localStorage.clear()" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
         </div>
     </aside>
 
@@ -52,12 +52,12 @@
                     📅 Memuat tanggal...
                 </div>
                 <div class="flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-100 shadow-sm">
-                    <div class="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-tr from-red-600 to-rose-400 text-white rounded-xl flex items-center justify-center font-bold text-xs md:text-sm shadow">
-                        YH
+                    <div class="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-tr from-red-600 to-rose-400 text-white rounded-xl flex items-center justify-center font-bold text-xs md:text-sm shadow" id="profileAvatar">
+                        YP
                     </div>
                     <div class="text-left hidden sm:block">
-                        <h4 class="text-xs font-bold text-slate-800" id="profileName">Ravi Hendrawan</h4>
-                        <p class="text-[10px] text-slate-400" id="profileEmail">aditiyaravi218@gmail.com</p>
+                        <h4 class="text-xs font-bold text-slate-800" id="profileName">Memuat...</h4>
+                        <p class="text-[10px] text-slate-400" id="profileRole">Memuat sesi...</p>
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@
                 </div>
             </div>
 
-            <!-- SECTION 2: Tabbed Tables -->
+            <!-- SECTION 2: Tabbed Tables / Cards -->
             <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 md:p-6 flex flex-col gap-6">
                 
                 <!-- Tab Header Nav -->
@@ -131,7 +131,8 @@
 
                 <!-- Tabel Pemasukan -->
                 <div id="tabPemasukan" class="tab-content active transition-opacity duration-300">
-                    <div class="overflow-x-auto">
+                    <!-- Tampilan Desktop (Tabel) -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
@@ -148,11 +149,16 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Tampilan Mobile (Card Vertikal Responsif) -->
+                    <div class="md:hidden flex flex-col divide-y divide-slate-100" id="cardPemasukanMobile">
+                        <div class="p-4 text-center text-slate-400 text-xs">Memuat data pemasukan...</div>
+                    </div>
                 </div>
 
                 <!-- Tabel Pengeluaran -->
                 <div id="tabPengeluaran" class="tab-content hidden transition-opacity duration-300">
-                    <div class="overflow-x-auto">
+                    <!-- Tampilan Desktop (Tabel) -->
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm whitespace-nowrap">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
@@ -167,6 +173,10 @@
                                 <tr><td colspan="5" class="text-center py-8 text-slate-400">Memuat data pengeluaran...</td></tr>
                             </tbody>
                         </table>
+                    </div>
+                    <!-- Tampilan Mobile (Card Vertikal Responsif) -->
+                    <div class="md:hidden flex flex-col divide-y divide-slate-100" id="cardPengeluaranMobile">
+                        <div class="p-4 text-center text-slate-400 text-xs">Memuat data pengeluaran...</div>
                     </div>
                 </div>
 
@@ -215,16 +225,14 @@
         </div>
     </div>
 
-    <!-- Script Terpadu (Pure Flask Fetch API) -->
+    <!-- Script Terpadu -->
     <script>
-        // ==========================================
-        // SATPAM PENGAMAN HALAMAN (AUTHENTICATION GUARD)
-        // ==========================================
+        // SATPAM PENGAMAN HALAMAN
         (function() {
             let activeEmail = localStorage.getItem('userEmail');
             if (!activeEmail) {
-                alert("Akses ditolak! Anda belum login atau sesi telah habis. Silakan login terlebih dahulu.");
-                window.location.href = 'login.html'; // Langsung ditendang ke halaman login
+                alert("Akses ditolak! Anda belum login atau sesi telah habis.");
+                window.location.href = 'login.html'; 
             }
         })();
 
@@ -250,38 +258,32 @@
         });
 
         async function muatProfilUser() {
-    try {
-        // Ambil murni dari sesi login lokal yang aktif (tanpa hardcoded email pribadi)
-        let userEmail = localStorage.getItem('userEmail');
-        
-        if (!userEmail) {
-            window.location.href = 'login.html';
-            return;
-        }
+            try {
+                let userEmail = localStorage.getItem('userEmail');
+                if (!userEmail) return;
 
-        let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
-        let res = await response.json();
-        
-        if (res && res.status === 'success') {
-            const namaUser = res.nama || userEmail.split('@')[0];
-            const emailUser = res.email || userEmail;
+                let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
+                let res = await response.json();
+                
+                if (res && res.status === 'success') {
+                    const namaUser = res.nama || userEmail.split('@')[0];
+                    const emailUser = res.email || userEmail;
 
-            // Masukkan ke elemen UI dengan aman
-            const elName = document.getElementById('profileName');
-            const elRole = document.getElementById('profileRole');
-            const elAvatar = document.getElementById('profileAvatar');
+                    const elName = document.getElementById('profileName');
+                    const elRole = document.getElementById('profileRole');
+                    const elAvatar = document.getElementById('profileAvatar');
 
-            if (elName) elName.innerText = namaUser;
-            if (elRole) elRole.innerText = emailUser;
-            if (elAvatar) {
-                let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                elAvatar.innerText = initials || 'YP';
+                    if (elName) elName.innerText = namaUser;
+                    if (elRole) elRole.innerText = emailUser;
+                    if (elAvatar) {
+                        let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                        elAvatar.innerText = initials || 'YP';
+                    }
+                }
+            } catch (e) {
+                console.log("Profil dimuat.");
             }
         }
-    } catch (e) {
-        console.log("Sesi dimuat secara aman.");
-    }
-}
 
         async function muatDetailKeuanganBulan(bulanStr) {
             let pemasukanList = [];
@@ -299,7 +301,7 @@
                     totalKeluar = res.data.total_keluar || 0;
                 }
             } catch (err) {
-                console.log("Gagal memuat detail keuangan dari Flask:", err);
+                console.log("Gagal memuat detail keuangan:", err);
             }
 
             let labaBersih = totalMasuk - totalKeluar;
@@ -311,9 +313,13 @@
             document.getElementById('countPemasukan').innerText = pemasukanList.length;
             document.getElementById('countPengeluaran').innerText = pengeluaranList.length;
 
+            // Render Pemasukan (Desktop & Mobile)
             const tbodyMasuk = document.getElementById('tabelPemasukanBody');
+            const cardMasukMobile = document.getElementById('cardPemasukanMobile');
+
             if (pemasukanList.length === 0) {
                 tbodyMasuk.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">Belum ada data pemasukan nota di bulan ini.</td></tr>`;
+                cardMasukMobile.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">Belum ada data pemasukan nota.</div>`;
             } else {
                 tbodyMasuk.innerHTML = pemasukanList.map(item => {
                     let cleanInv = (item.no_nota || '').replace(/#/g, '');
@@ -325,16 +331,41 @@
                             <td class="py-4 px-4"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-[11px] font-semibold">${item.status}</span></td>
                             <td class="py-4 px-4 font-bold text-slate-800">${formatRupiah(item.nominal)}</td>
                             <td class="py-4 px-4 text-center">
-                                <button onclick="window.location.href='edit_nota.html?inv=${cleanInv}'" class="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl font-semibold text-xs transition transform hover:scale-105">📄 Lihat Nota</button>
+                                <button onclick="window.location.href='edit_nota.html?inv=${cleanInv}'" class="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl font-semibold text-xs transition">📄 Lihat Nota</button>
                             </td>
                         </tr>
                     `;
                 }).join('');
+
+                cardMasukMobile.innerHTML = pemasukanList.map(item => {
+                    let cleanInv = (item.no_nota || '').replace(/#/g, '');
+                    return `
+                        <div class="p-4 flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-lg">#${cleanInv}</span>
+                                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-semibold">${item.status}</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800">${item.nama_klien}</h4>
+                                <p class="text-[11px] text-slate-400">📅 ${item.tgl_dibuat || item.tanggal || '-'}</p>
+                            </div>
+                            <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
+                                <span class="text-slate-500">Nominal Masuk:</span>
+                                <strong class="font-bold text-slate-800">${formatRupiah(item.nominal)}</strong>
+                            </div>
+                            <button onclick="window.location.href='edit_nota.html?inv=${cleanInv}'" class="w-full py-2 bg-blue-50 text-blue-600 rounded-xl font-semibold text-xs text-center hover:bg-blue-100 transition">📄 Lihat Nota</button>
+                        </div>
+                    `;
+                }).join('');
             }
 
+            // Render Pengeluaran (Desktop & Mobile)
             const tbodyKeluar = document.getElementById('tabelPengeluaranBody');
+            const cardKeluarMobile = document.getElementById('cardPengeluaranMobile');
+
             if (pengeluaranList.length === 0) {
                 tbodyKeluar.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400">Belum ada catatan pengeluaran di bulan ini.</td></tr>`;
+                cardKeluarMobile.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs">Belum ada catatan pengeluaran.</div>`;
             } else {
                 tbodyKeluar.innerHTML = pengeluaranList.map(item => `
                     <tr class="hover:bg-slate-50 transition">
@@ -346,6 +377,21 @@
                             <button onclick="hapusPengeluaran(${item.id})" class="px-3 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-semibold">🗑️ Hapus</button>
                         </td>
                     </tr>
+                `).join('');
+
+                cardKeluarMobile.innerHTML = pengeluaranList.map(item => `
+                    <div class="p-4 flex flex-col gap-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg">${item.kategori}</span>
+                            <span class="text-[11px] text-slate-400">📅 ${item.tanggal || '-'}</span>
+                        </div>
+                        <p class="text-xs text-slate-700 font-medium">${item.keterangan}</p>
+                        <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
+                            <span class="text-slate-500">Nominal Keluar:</span>
+                            <strong class="font-bold text-rose-600">${formatRupiah(item.nominal)}</strong>
+                        </div>
+                        <button onclick="hapusPengeluaran(${item.id})" class="w-full py-2 bg-rose-50 text-rose-600 rounded-xl font-semibold text-xs text-center hover:bg-rose-100 transition">🗑️ Hapus Catatan</button>
+                    </div>
                 `).join('');
             }
         }
@@ -412,10 +458,16 @@
                 return;
             }
 
+            let userSessionToken = localStorage.getItem('userSessionToken') || ('session_' + Math.random().toString(36).substring(2));
+            localStorage.setItem('userSessionToken', userSessionToken);
+
             try {
                 let response = await fetch('/api/simpan_pengeluaran', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-user-auth': userSessionToken
+                    },
                     body: JSON.stringify({ tanggal: tgl, kategori: kat, keterangan: ket, nominal: nominal })
                 });
                 let res = await response.json();
@@ -434,8 +486,14 @@
 
         async function hapusPengeluaran(id) {
             if (confirm("Yakin ingin menghapus catatan pengeluaran ini?")) {
+                let userSessionToken = localStorage.getItem('userSessionToken') || ('session_' + Math.random().toString(36).substring(2));
+                localStorage.setItem('userSessionToken', userSessionToken);
+
                 try {
-                    let response = await fetch(`/api/hapus_pengeluaran/${id}`, { method: 'DELETE' });
+                    let response = await fetch(`/api/hapus_pengeluaran/${id}`, { 
+                        method: 'DELETE',
+                        headers: { 'x-user-auth': userSessionToken }
+                    });
                     let res = await response.json();
                     if (res && res.status === 'success') {
                         location.reload();
