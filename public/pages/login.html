@@ -45,6 +45,14 @@
         .login-card.active-signup .form-signup-container { opacity: 1; pointer-events: auto; z-index: 15; }
         .login-card.active-signup .img-signin { display: none !important; }
         .login-card.active-signup .img-signup { display: block !important; }
+
+        /* Penyesuaian Responsif Layar HP */
+        @media (max-width: 768px) {
+            .login-card { width: 100%; max-width: 420px; height: auto; min-height: 520px; }
+            .banner-right { display: none !important; }
+            .form-left, .form-signup-container { width: 100% !important; position: relative !important; padding: 30px 20px; }
+            .form-signup-container { position: absolute !important; }
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-slate-100 p-4">
@@ -54,10 +62,10 @@
         
         <!-- 1. FORM SIGN IN (Kiri) -->
         <div class="form-left text-center">
-            <img src="../assets/logo_ipuzpita.png" alt="Logo" class="w-36 object-contain mb-3">
+            <img src="../assets/logo_ipuzpita.png" alt="Logo" class="w-32 sm:w-36 object-contain mb-3 mx-auto">
             <p class="text-xs text-slate-500 mb-5 font-medium">Sign in With Email & Password</p>
 
-            <div class="w-full max-w-[280px] space-y-3">
+            <div class="w-full max-w-[280px] space-y-3 mx-auto">
                 <input type="email" id="loginEmail" placeholder="Masukkan Email (@gmail.com)" required
                     class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 outline-none transition-all">
 
@@ -95,7 +103,7 @@
             <h3 class="text-lg font-bold text-slate-900 mb-1">Buat Akun Baru</h3>
             <p class="text-xs text-slate-500 mb-5 font-medium">Daftar dengan Token Rahasia Admin</p>
 
-            <div class="w-full max-w-[280px] space-y-3">
+            <div class="w-full max-w-[280px] space-y-3 mx-auto">
                 <input type="email" id="signupEmail" placeholder="Email (@gmail.com)" required
                     class="w-full px-4 py-3 bg-slate-100 border border-transparent rounded-full text-xs text-slate-800 focus:bg-white focus:border-red-600 outline-none transition-all">
 
