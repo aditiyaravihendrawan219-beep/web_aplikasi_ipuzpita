@@ -14,18 +14,20 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
-<body class="flex flex-col md:flex-row h-screen overflow-hidden text-slate-800">
+<body class="flex flex-col md:flex-row min-h-screen w-full overflow-x-hidden text-slate-800 bg-[#f4f6f9]">
 
-    <!-- SIDEBAR -->
+    <!-- 1. SIDEBAR DESKTOP & MOBILE DRAWER -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden md:hidden transition-opacity opacity-0" onclick="toggleMobileSidebar()"></div>
 
     <aside id="sidebarMenu" class="fixed md:static inset-y-0 left-0 w-20 bg-white border-r border-slate-100 flex flex-col items-center py-6 justify-between shrink-0 shadow-sm z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="hidden md:flex w-12 h-12 bg-red-50/50 rounded-2xl items-center justify-center p-2 shadow-inner border border-red-100">
-            <img src="../assets/logo ipuzpita kotak.ico" alt="Logo" class="w-full h-full object-contain" onerror="this.src='../assets/images/logo_ipuzpita.png'">
+            <img src="../assets/logo ipuzpita kotak.ico" alt="Logo IpuzPita" class="w-full h-full object-contain" onerror="this.src='../assets/images/logo_ipuzpita.png'">
         </div>
 
         <div class="flex flex-col gap-6 items-center">
+            <!-- Tombol Tutup Sidebar Khusus Mobile -->
             <button onclick="toggleMobileSidebar()" class="md:hidden w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center font-bold mb-2">✕</button>
+
             <a href="dashboard.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Dashboard">📊</a>
             <a href="buat_nota.html" class="w-12 h-12 bg-red-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-red-200 transition transform hover:scale-105" title="Buat Nota">📝</a>
             <a href="riwayat.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Riwayat Pesanan">📜</a>
@@ -34,30 +36,32 @@
 
         <div class="flex flex-col gap-4 items-center">
             <a href="pengaturan.html" class="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center hover:bg-slate-100 transition" title="Pengaturan">⚙️</a>
-            <a href="login.html" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
+            <a href="login.html" onclick="localStorage.clear()" class="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center hover:bg-red-100 transition" title="Keluar">🚪</a>
         </div>
     </aside>
 
-    <!-- KONTEN UTAMA -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden">
-        <header class="h-16 md:h-20 bg-white border-b border-slate-100 px-3 md:px-8 flex items-center justify-between shrink-0 gap-3">
+    <!-- 2. KONTEN UTAMA -->
+    <main class="flex-1 flex flex-col min-h-screen w-full overflow-y-auto custom-scrollbar pb-32">
+        <header class="h-16 md:h-20 bg-white border-b border-slate-100 px-3 md:px-8 flex items-center justify-between shrink-0 gap-3 sticky top-0 z-20 shadow-xs">
             <div class="flex items-center gap-2.5 overflow-hidden">
-                <button onclick="toggleMobileSidebar()" class="md:hidden w-9 h-9 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center font-bold">☰</button>
-                <div>
-                    <h1 class="text-xs sm:text-sm md:text-xl font-bold text-slate-900">Buat Nota Transaksi Baru 📝</h1>
+                <button onclick="toggleMobileSidebar()" class="md:hidden w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl flex items-center justify-center font-bold text-base transition shadow-sm shrink-0" title="Menu Navigasi">
+                    ☰
+                </button>
+                <div class="overflow-hidden">
+                    <h1 class="text-xs sm:text-sm md:text-xl font-bold text-slate-900 tracking-tight whitespace-nowrap">Buat Nota Transaksi Baru 📝</h1>
                     <p class="hidden md:block text-xs text-slate-400">Isi formulir di bawah ini untuk menerbitkan invoice / nota pesanan.</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-2xl border border-slate-100">
-                <div class="w-7 h-7 md:w-9 md:h-9 bg-gradient-to-tr from-red-600 to-rose-400 text-white rounded-xl flex items-center justify-center font-bold text-xs" id="profileAvatar">YH</div>
+            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1.5 rounded-2xl border border-slate-100 shrink-0">
+                <div class="w-7 h-7 md:w-9 md:h-9 bg-gradient-to-tr from-red-600 to-rose-400 text-white rounded-xl flex items-center justify-center font-bold text-xs" id="profileAvatar">YP</div>
                 <div class="text-left hidden sm:block">
                     <h4 class="text-xs font-bold text-slate-800" id="profileName">Memuat...</h4>
-                    <p class="text-[10px] text-slate-400" id="profileRole">Memuat...</p>
+                    <p class="text-[10px] text-slate-400" id="profileRole">Memuat sesi...</p>
                 </div>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+        <div class="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
             <!-- Kolom Kiri -->
             <div class="bg-white p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col gap-4 h-fit">
                 <h3 class="text-sm md:text-base font-bold text-slate-800 border-b border-slate-100 pb-3">1. Informasi Pelanggan & Acara</h3>
@@ -114,7 +118,7 @@
                             </div>
                             <div class="row-sub-box flex flex-col gap-1">
                                 <span class="text-[11px] font-medium text-slate-500">Sub-Keterangan (pisahkan dengan enter):</span>
-                                <textarea class="input-text item-sub bg-white text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none resize-y" rows="7" placeholder="- Busana akad&#10;- Makeup ortu"></textarea>
+                                <textarea class="input-text item-sub bg-white text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none resize-y" rows="5" placeholder="- Busana akad&#10;- Makeup ortu"></textarea>
                             </div>
                         </div>
                     </div>
@@ -147,13 +151,13 @@
                     <div class="flex justify-between text-sm font-bold"><span>Sisa Kekurangan:</span><strong id="summarySisa" class="text-red-600">Rp 0</strong></div>
                 </div>
 
-                <!-- Tombol Aksi Bawah -->
-                <div class="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-slate-100">
-                    <button type="button" class="w-full sm:w-auto px-5 py-3 bg-slate-100 text-slate-600 text-xs font-semibold rounded-2xl hover:bg-slate-200 transition" onclick="resetFormNota()">Reset</button>
-                    <button type="button" class="w-full sm:flex-1 py-3 bg-blue-50 text-blue-600 text-xs font-semibold rounded-2xl hover:bg-blue-100 transition flex items-center justify-center gap-2" onclick="previewNota()">
+                <!-- Tombol Aksi Bawah dengan ruang longgar di HP -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-slate-100 pb-8">
+                    <button type="button" class="w-full sm:w-auto px-5 py-3.5 bg-slate-100 text-slate-600 text-xs font-semibold rounded-2xl hover:bg-slate-200 transition" onclick="resetFormNota()">Reset</button>
+                    <button type="button" class="w-full sm:flex-1 py-3.5 bg-blue-50 text-blue-600 text-xs font-semibold rounded-2xl hover:bg-blue-100 transition flex items-center justify-center gap-2" onclick="previewNota()">
                         <span>👁️</span> Pratinjau Nota
                     </button>
-                    <button type="button" class="w-full sm:flex-1 py-3 bg-red-600 text-white text-xs font-bold rounded-2xl shadow-md shadow-red-200 hover:bg-red-700 transition flex items-center justify-center gap-2" onclick="simpanDanCetakNota()">
+                    <button type="button" class="w-full sm:flex-1 py-3.5 bg-red-600 text-white text-xs font-bold rounded-2xl shadow-md shadow-red-200 hover:bg-red-700 transition flex items-center justify-center gap-2" onclick="simpanDanCetakNota()">
                         <span>💾</span> Simpan & Cetak
                     </button>
                 </div>
@@ -162,7 +166,7 @@
     </main>
 
     <!-- KUSTOM TOAST NOTIFIKASI -->
-    <div id="toastNotif" class="fixed top-6 right-6 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div id="toastNotif" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
         <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-800">
             <span id="toastIcon" class="text-xl">⚠️</span>
             <div>
@@ -172,66 +176,63 @@
         </div>
     </div>
 
-    <!-- Script Kustom Lengkap + Satpam Pengaman Sesi -->
+    <!-- Script Kustom Lengkap -->
     <script>
-        // ==========================================
-        // SATPAM PENGAMAN HALAMAN (AUTHENTICATION GUARD)
-        // ==========================================
+        // SATPAM PENGAMAN HALAMAN
         (function() {
             let activeEmail = localStorage.getItem('userEmail');
             if (!activeEmail) {
-                alert("Akses ditolak! Anda belum login atau sesi telah habis. Silakan login terlebih dahulu.");
-                window.location.href = 'login.html'; // Langsung ditendang ke halaman login
+                alert("Akses ditolak! Anda belum login atau sesi telah habis.");
+                window.location.href = 'login.html'; 
             }
         })();
 
         document.addEventListener('DOMContentLoaded', () => {
             generateNomorInvoiceOtomatis();
             muatProfilUser();
-            inisialisasiNavigasiEnter();
         });
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebarMenu');
             const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-            setTimeout(() => overlay.classList.toggle('opacity-0'), 10);
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
         }
 
         async function muatProfilUser() {
-    try {
-        // Ambil murni dari sesi login lokal yang aktif (tanpa hardcoded email pribadi)
-        let userEmail = localStorage.getItem('userEmail');
-        
-        if (!userEmail) {
-            window.location.href = 'login.html';
-            return;
-        }
+            try {
+                let userEmail = localStorage.getItem('userEmail');
+                if (!userEmail) return;
 
-        let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
-        let res = await response.json();
-        
-        if (res && res.status === 'success') {
-            const namaUser = res.nama || userEmail.split('@')[0];
-            const emailUser = res.email || userEmail;
+                let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
+                let res = await response.json();
+                
+                if (res && res.status === 'success') {
+                    const namaUser = res.nama || userEmail.split('@')[0];
+                    const emailUser = res.email || userEmail;
 
-            // Masukkan ke elemen UI dengan aman
-            const elName = document.getElementById('profileName');
-            const elRole = document.getElementById('profileRole');
-            const elAvatar = document.getElementById('profileAvatar');
+                    const elName = document.getElementById('profileName');
+                    const elRole = document.getElementById('profileRole');
+                    const elAvatar = document.getElementById('profileAvatar');
 
-            if (elName) elName.innerText = namaUser;
-            if (elRole) elRole.innerText = emailUser;
-            if (elAvatar) {
-                let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                elAvatar.innerText = initials || 'YP';
+                    if (elName) elName.innerText = namaUser;
+                    if (elRole) elRole.innerText = emailUser;
+                    if (elAvatar) {
+                        let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                        elAvatar.innerText = initials || 'YP';
+                    }
+                }
+            } catch (e) {
+                console.log("Sesi dimuat secara aman.");
             }
         }
-    } catch (e) {
-        console.log("Sesi dimuat secara aman.");
-    }
-}
 
         async function generateNomorInvoiceOtomatis() {
             try {
@@ -286,7 +287,7 @@
                 </div>
                 <div class="row-sub-box flex flex-col gap-1">
                     <span class="text-[11px] font-medium text-slate-500">Sub-Keterangan (pisahkan dengan enter):</span>
-                    <textarea class="input-text item-sub bg-white text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none resize-y" rows="7" placeholder="- Busana akad&#10;- Makeup ortu"></textarea>
+                    <textarea class="input-text item-sub bg-white text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none resize-y" rows="5" placeholder="- Busana akad&#10;- Makeup ortu"></textarea>
                 </div>
             `;
             container.appendChild(div);
@@ -297,7 +298,7 @@
                 btn.closest('.item-row').remove();
                 hitungTotalOtomatis();
             } else { 
-                showToast("Perhatian", "Minimal harus ada 1 item layanan, Yang Mulia!", "warning"); 
+                showToast("Perhatian", "Minimal harus ada 1 item layanan!", "warning"); 
             }
         }
 
@@ -330,56 +331,6 @@
             document.getElementById('summaryTotal').innerText = `Rp ${total.toLocaleString('id-ID')}`;
             document.getElementById('summaryDibayar').innerText = `Rp ${dibayar.toLocaleString('id-ID')}`;
             document.getElementById('summarySisa').innerText = `Rp ${sisa.toLocaleString('id-ID')}`;
-        }
-
-        function inisialisasiNavigasiEnter() {
-            const inputNama = document.getElementById('notaNamaKlien');
-            const inputNoHp = document.getElementById('notaNoHp');
-            const inputTanggal = document.getElementById('notaTanggalAcara');
-            const inputLokasi = document.getElementById('notaLokasi');
-            const inputDp = document.getElementById('notaNominalDp');
-
-            if (inputNama) {
-                inputNama.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        inputNoHp.focus();
-                    }
-                });
-            }
-
-            if (inputNoHp) {
-                inputNoHp.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        let hpVal = inputNoHp.value.trim();
-                        if (!hpVal || !/^[0-9+\-\s]+$/.test(hpVal)) {
-                            showToast("Format Tidak Valid", "Nomor WhatsApp wajib diisi dengan format nomor yang benar!", "warning");
-                            inputNoHp.focus();
-                            return;
-                        }
-                        inputTanggal.focus();
-                    }
-                });
-            }
-
-            if (inputTanggal) {
-                inputTanggal.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        inputLokasi.focus();
-                    }
-                });
-            }
-
-            if (inputDp) {
-                inputDp.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        simpanDanCetakNota();
-                    }
-                });
-            }
         }
 
         function validasiFormUtama() {
@@ -469,19 +420,15 @@
                 sisa: parseNominal(document.getElementById('summarySisa').innerText)
             };
 
-            // Buat atau ambil token sesi unik acak yang aman secara lokal (tanpa email pribadi)
-            let userSessionToken = localStorage.getItem('userSessionToken');
-            if (!userSessionToken) {
-                userSessionToken = 'session_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
-                localStorage.setItem('userSessionToken', userSessionToken);
-            }
+            let userSessionToken = localStorage.getItem('userSessionToken') || ('session_' + Math.random().toString(36).substring(2));
+            localStorage.setItem('userSessionToken', userSessionToken);
 
             try {
                 let response = await fetch('/api/simpan_nota_baru', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'x-user-auth': userSessionToken // <-- Kirim token sesi acak yang aman
+                        'x-user-auth': userSessionToken 
                     },
                     body: JSON.stringify(data)
                 });
@@ -513,12 +460,12 @@
             msgEl.innerText = pesan;
             iconEl.innerText = tipe === 'success' ? '✅' : (tipe === 'error' ? '❌' : '⚠️');
 
-            toast.classList.remove('-translate-y-20', 'opacity-0', 'pointer-events-none');
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
             toast.classList.add('translate-y-0', 'opacity-100');
 
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('-translate-y-20', 'opacity-0', 'pointer-events-none');
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
             }, 3500);
         }
     </script>
