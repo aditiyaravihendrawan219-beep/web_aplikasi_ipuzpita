@@ -8,11 +8,12 @@
     <script type="text/javascript" src="/eel.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-        body { background: #f4f4f4; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        body { background: #f4f4f4; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* Perlebar container tombol aksi agar sejajar dengan nota */
+        /* Container Tombol Aksi */
         .action-container {
-            width: 750px;
+            width: 100%;
+            max-width: 750px;
             display: flex;
             justify-content: flex-end;
             gap: 10px;
@@ -52,12 +53,13 @@
             background-color: #d1d5db;
         }
 
-        /* Perbesar lebar kartu nota utama dari 600px menjadi 750px supaya lebih lega dan tidak berantakan */
+        /* Kartu Nota Utama (Lebar optimal 750px, responsif di HP) */
         .invoice-card { 
             background: #fff; 
-            width: 750px; 
+            width: 100%;
+            max-width: 750px; 
             padding: 35px; 
-            border-radius: 12px; 
+            border-radius: 16px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
             transition: all 0.3s ease;
         }
@@ -77,7 +79,8 @@
         .invoice-title p { font-size: 12px; color: #666; }
         .info-grid { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 20px; color: #333; }
         
-        .table-detail { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+        .table-container { width: 100%; overflow-x: auto; margin-bottom: 20px; }
+        .table-detail { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
         .table-detail th { 
             background: #E10600; 
             color: #fff; 
@@ -86,6 +89,10 @@
         }
         .table-detail td { padding: 10px 12px; border-bottom: 1px solid #eee; vertical-align: middle; }
         
+        .table-detail th:nth-child(2), .table-detail td:nth-child(2) { text-align: center; width: 60px; }
+        .table-detail th:nth-child(3), .table-detail td:nth-child(3) { text-align: right; width: 120px; white-space: nowrap !important; }
+        .table-detail th:nth-child(4), .table-detail td:nth-child(4) { text-align: right; width: 130px; white-space: nowrap !important; font-weight: 600; }
+
         .total-box { background: #f9f9f9; padding: 15px; border-radius: 8px; font-size: 13px; }
         .total-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
         .footer-note { text-align: center; margin-top: 25px; font-size: 11px; color: #777; }
@@ -120,23 +127,6 @@
             .invoice-card { box-shadow: none !important; width: 100% !important; border: none !important; padding: 10px !important; }
             @page { margin: 10mm; }
         }
-
-        .table-detail { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
-        .table-detail th { 
-            background: #E10600; 
-            color: #fff; 
-            padding: 10px 12px; 
-        }
-        .table-detail td { 
-            padding: 10px 12px; 
-            border-bottom: 1px solid #eee; 
-            vertical-align: middle; 
-        }
-        
-        /* Pastikan kolom Price dan Total punya ruang yang cukup dan teksnya tidak turun baris */
-        .table-detail th:nth-child(2), .table-detail td:nth-child(2) { text-align: center; width: 60px; }
-        .table-detail th:nth-child(3), .table-detail td:nth-child(3) { text-align: right; width: 120px; white-space: nowrap !important; }
-        .table-detail th:nth-child(4), .table-detail td:nth-child(4) { text-align: right; width: 130px; white-space: nowrap !important; font-weight: 600; }
     </style>
 </head>
 <body id="bodyCard">
@@ -171,20 +161,22 @@
             </div>
         </div>
 
-        <!-- Tabel Detail Item dengan Kolom Qty & Unit Price -->
-        <table class="table-detail">
-            <thead>
-                <tr>
-                    <th>ITEM DESCRIPTION</th>
-                    <th style="text-align: center; width: 50px;">Qty</th>
-                    <th style="text-align: right; width: 100px;">Price</th>
-                    <th style="text-align: right; width: 100px;">Total</th>
-                </tr>
-            </thead>
-            <tbody id="invItemTableBody">
-                <!-- Data dimuat dinamis oleh JavaScript -->
-            </tbody>
-        </table>
+        <!-- Tabel Detail Item (Responsif & Rapi) -->
+        <div class="table-container">
+            <table class="table-detail">
+                <thead>
+                    <tr>
+                        <th>ITEM DESCRIPTION</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="invItemTableBody">
+                    <!-- Data dimuat dinamis oleh JavaScript -->
+                </tbody>
+            </table>
+        </div>
 
         <div class="total-box">
             <div class="total-row">
@@ -267,7 +259,7 @@
             document.getElementById('invDibayar').innerText = 'Rp ' + dibayar.toLocaleString('id-ID');
             document.getElementById('invSisa').innerText = 'Rp ' + sisa.toLocaleString('id-ID');
 
-            // Render Item Tabel Secara Dinamis (Mendukung Paket Utama, Sub-Keterangan, & Qty)
+            // Render Item Tabel Secara Dinamis
             const tbody = document.getElementById('invItemTableBody');
             let htmlItems = '';
 
@@ -277,7 +269,6 @@
                     if (item.tipe === 'diskon') subtotal = -Math.abs(subtotal);
 
                     if (item.tipe === 'utama') {
-                        // Paket Utama: Tampilkan Qty dan Harga Satuan secara lengkap
                         htmlItems += `
                             <tr style="background-color: #fafafa; font-weight: bold;">
                                 <td style="width: 55%;"><strong>${item.nama}</strong></td>
@@ -302,7 +293,6 @@
                             });
                         }
                     } else {
-                        // Item Tambahan / Diskon (Lengkap dengan Qty dan Unit Price)
                         htmlItems += `
                             <tr>
                                 <td style="width: 55%;">${item.nama}</td>
