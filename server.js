@@ -37,13 +37,16 @@ app.use('/pages', express.static(path.join(__dirname, 'public/pages')));
 // SATPAM MIDDLEWARE KEAMANAN BACKEND API
 // ==========================================
 function authMiddleware(req, res, next) {
-    // IZINKAN SEMUA RUTE LOGIN, REGISTER, RESET PASSWORD, DAN FILE STATIS UNTUK LEWAT TANPA SESI
+    // Gunakan req.originalUrl agar mendeteksi jalur URL secara utuh dan akurat
+    const urlLengkap = req.originalUrl || req.url;
+
+    // IZINKAN SEMUA RUTE AUTENTIKASI DAN PUBLIK UNTUK LEWAT TANPA SESI
     if (
-        req.path.startsWith('/api/login') || 
-        req.path.startsWith('/api/register') || 
-        req.path.startsWith('/api/reset_password') || 
-        req.path.startsWith('/api/generate_invoice') ||
-        req.path.startsWith('/api/user_profile')
+        urlLengkap.includes('/api/login') || 
+        urlLengkap.includes('/api/register') || 
+        urlLengkap.includes('/api/reset_password') || 
+        urlLengkap.includes('/api/generate_invoice') ||
+        urlLengkap.includes('/api/user_profile')
     ) {
         return next();
     }
@@ -59,7 +62,7 @@ function authMiddleware(req, res, next) {
 }
 
 app.use('/api', authMiddleware);
-    
+
 
 // ==========================================
 // FUNGSI PINTAR AUTOMATIC FAILOVER DUAL DB
