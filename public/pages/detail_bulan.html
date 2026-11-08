@@ -379,20 +379,29 @@
                     </tr>
                 `).join('');
 
-                cardKeluarMobile.innerHTML = pengeluaranList.map(item => `
-                    <div class="p-4 flex flex-col gap-2.5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg">${item.kategori}</span>
-                            <span class="text-[11px] text-slate-400">📅 ${item.tanggal || '-'}</span>
+                cardMasukMobile.innerHTML = pemasukanList.map(item => {
+                    let cleanInv = (item.no_nota || '').replace(/#/g, '');
+                    return `
+                        <div class="p-4 flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-lg">#${cleanInv}</span>
+                                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-semibold">${item.status}</span>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800">${item.nama_klien}</h4>
+                                <p class="text-[11px] text-slate-400">📅 ${item.tgl_dibuat || item.tanggal || '-'}</p>
+                            </div>
+                            <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
+                                <span class="text-slate-500">Nominal Masuk:</span>
+                                <strong class="font-bold text-slate-800">${formatRupiah(item.nominal)}</strong>
+                            </div>
+                            <!-- TAMBAHKAN TOMBOL INI AGAR MUNCUL DI HP -->
+                            <button onclick="window.location.href='edit_nota.html?inv=${cleanInv}'" class="w-full py-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl font-semibold text-xs text-center transition shadow-sm">
+                                📄 Lihat / Edit Nota
+                            </button>
                         </div>
-                        <p class="text-xs text-slate-700 font-medium">${item.keterangan}</p>
-                        <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
-                            <span class="text-slate-500">Nominal Keluar:</span>
-                            <strong class="font-bold text-rose-600">${formatRupiah(item.nominal)}</strong>
-                        </div>
-                        <button onclick="hapusPengeluaran(${item.id})" class="w-full py-2 bg-rose-50 text-rose-600 rounded-xl font-semibold text-xs text-center hover:bg-rose-100 transition">🗑️ Hapus Catatan</button>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         }
 
