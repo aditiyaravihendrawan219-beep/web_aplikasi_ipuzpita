@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buat Nota - IpuzPita MAKE UP</title>
+    <!-- Favicon Ikon Logo IpuzPita -->
+    <link rel="icon" type="image/x-icon" href="../assets/logo ipuzpita kotak.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -20,7 +22,6 @@
     <aside id="sidebarMenu" class="fixed md:static inset-y-0 left-0 w-20 bg-white border-r border-slate-100 flex flex-col items-center py-6 justify-between shrink-0 shadow-sm z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="hidden md:flex w-12 h-12 bg-red-50/50 rounded-2xl items-center justify-center p-2 shadow-inner border border-red-100">
             <img src="../assets/logo ipuzpita kotak.ico" alt="Logo" class="w-full h-full object-contain" onerror="this.src='../assets/images/logo_ipuzpita.png'">
-            
         </div>
 
         <div class="flex flex-col gap-6 items-center">
@@ -160,7 +161,7 @@
         </div>
     </main>
 
-    <!-- KUSTOM TOAST NOTIFIKASI (Diletakkan di luar kontainer item agar bersih) -->
+    <!-- KUSTOM TOAST NOTIFIKASI -->
     <div id="toastNotif" class="fixed top-6 right-6 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
         <div class="bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-800">
             <span id="toastIcon" class="text-xl">⚠️</span>
@@ -171,7 +172,7 @@
         </div>
     </div>
 
-    <!-- Script Kustom -->
+    <!-- Script Kustom Lengkap -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             generateNomorInvoiceOtomatis();
@@ -189,7 +190,8 @@
 
         async function muatProfilUser() {
             try {
-                let res = await (await fetch('/api/user_profile')).json();
+                let userEmail = localStorage.getItem('userEmail') || 'aditiyaravi218@gmail.com';
+                let res = await (await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`)).json();
                 if (res.status === 'success') {
                     document.getElementById('profileName').innerText = res.nama;
                     document.getElementById('profileRole').innerText = res.email;
@@ -296,9 +298,6 @@
             document.getElementById('summarySisa').innerText = `Rp ${sisa.toLocaleString('id-ID')}`;
         }
 
-        // ==========================================
-        // FITUR NAVIGASI ENTER & VALIDASI WHATSAPP
-        // ==========================================
         function inisialisasiNavigasiEnter() {
             const inputNama = document.getElementById('notaNamaKlien');
             const inputNoHp = document.getElementById('notaNoHp');
@@ -457,7 +456,6 @@
             }
         }
 
-        // Fungsi Toast Global
         function showToast(judul, pesan, tipe = 'warning') {
             const toast = document.getElementById('toastNotif');
             const titleEl = document.getElementById('toastTitle');

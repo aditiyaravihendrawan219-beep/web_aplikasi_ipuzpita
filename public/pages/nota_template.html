@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nota Pesanan - IpuzPita MAKE UP</title>
+    <!-- Favicon Ikon Logo IpuzPita -->
+    <link rel="icon" type="image/x-icon" href="../assets/logo ipuzpita kotak.ico">
     <!-- Tambahkan skrip Eel agar koneksi Python aktif di halaman ini -->
     <script type="text/javascript" src="/eel.js"></script>
     <style>
@@ -210,6 +212,7 @@
             </div>
         </div>
 
+        <!-- Catatan Kaki / Footer Nota -->
         <div class="footer-note">
             <p>Terima kasih telah mempercayakan momen spesial Anda kepada <strong>IpuzPita MAKE UP</strong>.</p>
         </div>
@@ -237,7 +240,7 @@
             let dp = data.dp || 0;
             let status = data.status || 'Menunggu Pembayaran';
 
-            // Logika Otomatis: Jika sisa pelunasan sudah 0, otomatis ubah status jadi Lunas
+            // Logika Cerdas: Jika sisa pelunasan sudah 0, otomatis ubah status jadi Lunas
             let dibayar = status === 'Lunas' ? total : (status === 'DP Masuk' ? dp : 0);
             let sisa = Math.max(0, total - dibayar);
 
