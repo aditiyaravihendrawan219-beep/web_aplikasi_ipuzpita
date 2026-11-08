@@ -204,29 +204,33 @@
         }
 
         async function muatProfilUser() {
-            try {
-                let userEmail = localStorage.getItem('userEmail') || 'aditiyaravi218@gmail.com';
-                let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
-                let res = await response.json();
-                
-                if (res && res.status === 'success') {
-                    const emailUser = res.email || userEmail;
-                    const namaUser = res.nama || 'Ravi Hendrawan';
-                    
-                    const welcomeTitle = document.getElementById('welcome-title');
-                    if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali, ${namaUser} 👋`;
-                    
-                    const profileName = document.getElementById('profileName');
-                    const profileRole = document.getElementById('profileRole');
-                    if (profileName) profileName.innerText = namaUser;
-                    if (profileRole) profileRole.innerText = emailUser;
+    // Berikan teks placeholder yang rapi terlebih dahulu agar tidak tumpang tindih
+    const welcomeTitle = document.getElementById('welcome-title');
+    if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali 👋`;
 
-                    const profileInitial = document.getElementById('profileInitial');
-                    if (profileInitial) {
-                        let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-                        profileInitial.innerText = initials || 'YH';
-                    }
-                }
+    try {
+        let userEmail = localStorage.getItem('userEmail') || 'aditiyaravi218@gmail.com';
+        let response = await fetch(`/api/user_profile?email=${encodeURIComponent(userEmail)}`);
+        let res = await response.json();
+        
+        if (res && res.status === 'success') {
+            const emailUser = res.email || userEmail;
+            const namaUser = res.nama || 'Ravi Hendrawan';
+            
+            // Setelah data siap, tampilkan nama asli dengan mulus
+            if (welcomeTitle) welcomeTitle.innerHTML = `Selamat datang kembali, ${namaUser} 👋`;
+            
+            const profileName = document.getElementById('profileName');
+            const profileRole = document.getElementById('profileRole');
+            if (profileName) profileName.innerText = namaUser;
+            if (profileRole) profileRole.innerText = emailUser;
+
+            const profileInitial = document.getElementById('profileInitial');
+            if (profileInitial) {
+                let initials = namaUser.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                profileInitial.innerText = initials || 'YH';
+            }
+        }
             } catch (err) {
                 console.log("Gagal memuat profil:", err);
             }
