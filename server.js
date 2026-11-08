@@ -37,32 +37,33 @@ app.use('/pages', express.static(path.join(__dirname, 'public/pages')));
 // SATPAM MIDDLEWARE KEAMANAN BACKEND API
 // ==========================================
 function authMiddleware(req, res, next) {
-    // Gunakan req.originalUrl agar mendeteksi jalur URL secara utuh dan akurat
     const urlLengkap = req.originalUrl || req.url;
 
-    // IZINKAN SEMUA RUTE AUTENTIKASI DAN PUBLIK UNTUK LEWAT TANPA SESI
+    // IZINKAN SEMUA RUTE PUBLIK & API UTAMA AGAR TIDAK TERKENA 401
     if (
         urlLengkap.includes('/api/login') || 
         urlLengkap.includes('/api/register') || 
         urlLengkap.includes('/api/reset_password') || 
         urlLengkap.includes('/api/generate_invoice') ||
-        urlLengkap.includes('/api/user_profile')
+        urlLengkap.includes('/api/user_profile') ||
+        urlLengkap.includes('/api/dashboard_summary') ||
+        urlLengkap.includes('/api/semua_riwayat') ||
+        urlLengkap.includes('/api/simpan_nota_baru') ||
+        urlLengkap.includes('/api/rekap_keuangan')
     ) {
         return next();
     }
 
-    let clientAuth = req.headers['x-user-auth'] || req.query.email;
+    let clientAuth = req.headers['x-user-auth'] || req.query.email || req.query.token;
 
-    // Jika mencoba akses API data sensitif tanpa identitas user, tolak
     if (!clientAuth) {
-        return res.status(401).json({ status: 'error', message: 'Akses ditolak! Sesi tidak valid atau tidak diizinkan.' });
+        return res.status(401).json({ status: 'error', message: 'Akses ditolak! Sesi tidak valid.' });
     }
     
     next();
 }
 
 app.use('/api', authMiddleware);
-
 
 // ==========================================
 // FUNGSI PINTAR AUTOMATIC FAILOVER DUAL DB
@@ -95,7 +96,7 @@ app.get('/api/user_profile', async (req, res) => {
         let emailUser = req.query.email || req.headers['x-user-auth'];
         
         if (!emailUser) {
-            return res.json({ status: 'success', nama: "Ravi Hendrawan", email: "aditiyaravi218@gmail.com" });
+            return res.json({ status: 'success', nama: "Owner", email: "aktif@ipuzpita.com" });
         }
 
         let { data, error } = await dbQueryDual(async (db) => {
@@ -112,7 +113,7 @@ app.get('/api/user_profile', async (req, res) => {
             email: data.email 
         });
     } catch (e) {
-        res.json({ status: 'success', nama: "Ravi Hendrawan", email: "aditiyaravi218@gmail.com" });
+        res.json({ status: 'success', nama: "Owner", email: "aktif@ipuzpita.com" });
     }
 });
 
@@ -435,31 +436,39 @@ app.delete('/api/hapus_pengeluaran/:id', async (req, res) => {
 });
 
 // ==========================================
-// SATPAM MIDDLEWARE KEAMANAN BACKEND API
+// FALLBACK & SERVER LISTENER (All Pages Router)
 // ==========================================
-function authMiddleware(req, res, next) {
-    const urlLengkap = req.originalUrl || req.url;
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
+});
 
-    // IZINKAN RUTE PUBLIK & API UTAMA AGAR TIDAK TERKENA 401
-    if (
-        urlLengkap.includes('/api/login') || 
-        urlLengkap.includes('/api/register') || 
-        urlLengkap.includes('/api/reset_password') || 
-        urlLengkap.includes('/api/generate_invoice') ||
-        urlLengkap.includes('/api/user_profile') ||
-        urlLengkap.includes('/api/dashboard_summary') ||
-        urlLengkap.includes('/api/semua_riwayat') ||
-        urlLengkap.includes('/api/simpan_nota_baru') ||
-        urlLengkap.includes('/api/rekap_keuangan')
-    ) {
-        return next();
-    }
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard.html'));
+});
 
-    let clientAuth = req.headers['x-user-auth'] || req.query.email;
+app.get('/dashboard.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard.html'));
+});
 
-    if (!clientAuth) {
-        return res.status(401).json({ status: 'error', message: 'Akses ditolak! Sesi tidak valid.' });
-    }
-    
-    next();
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
+});
+
+const daftarHalaman = ['buat_nota', 'riwayat', 'keuangan', 'pengaturan', 'edit_nota', 'detail_bulan', 'dp_masuk', 'lunas', 'menunggu_dp', 'nota_template'];
+
+daftarHalaman.forEach(namaHalaman => {
+    app.get(`/${namaHalaman}`, (req, res) => {
+        res.sendFile(path.join(__dirname, 'public', 'pages', `${namaHalaman}.html`));
+    });
+    app.get(`/${namaHalaman}.html`, (req, res) => {
+        res.sendFile(path.join(__dirname, 'public', 'pages', `${namaHalaman}.html`));
+    });
+});
+
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server lokal berjalan di port ${PORT}`);
+    });
 }
+
+module.exports = app;
