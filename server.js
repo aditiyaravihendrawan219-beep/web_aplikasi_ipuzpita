@@ -336,16 +336,27 @@ app.delete('/api/hapus_pengeluaran/:id', async (req, res) => {
     }
 });
 
-/// ==========================================
-// FALLBACK & SERVER LISTENER (All Pages Router)
+// ==========================================
+// FALLBACK & SERVER LISTENER
 // ==========================================
 
+// Rute untuk Halaman Utama / Login
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
 });
 
+// Rute untuk Halaman Dashboard
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard.html'));
+});
+
+// Rute opsional untuk ekstensi .html
+app.get('/dashboard.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'dashboard.html'));
+});
+
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'login.html'));
 });
 
 // Daftar rute otomatis untuk semua halaman pendukung di dalam folder public/pages/
@@ -365,5 +376,6 @@ if (process.env.NODE_ENV !== 'production') {
         console.log(`🚀 Server lokal berjalan di port ${PORT}`);
     });
 }
+
 
 module.exports = app;
