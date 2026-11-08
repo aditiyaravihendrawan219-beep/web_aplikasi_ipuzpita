@@ -434,6 +434,70 @@ app.delete('/api/hapus_pengeluaran/:id', async (req, res) => {
     }
 });
 
+// 12. Rincian Detail Keuangan Per Bulan
+app.get('/api/detail_keuangan/:bulan', async (req, res) => {
+    let bulanParam = req.params.bulan; // Format: "2026-11"
+    try {
+        let { data: transaksi } = await dbQueryDual(async (db) => { 
+            return await db.from('transaksi_nota').select('*'); 
+        });
+        let { data: pengeluaran } = await dbQueryDual(async (db) => { 
+            return await db.from('transaksi_pengeluaran').select('*'); 
+        });
+
+        // Filter pemasukan nota berdasarkan bulan
+        let pemasukanBulanIni = [];
+        let totalMasuk = 0;
+
+        (transaksi || []).forEach(trx => {
+            let tgl = trx.tgl_acara || trx.created_at || '';
+            if (tgl.startsWith(bulanParam)) {
+                let masuk = trx.status === 'Lunas' ? (parseFloat(trx.total_tagihan) || 0) : (trx.status === 'DP Masuk' ? (parseFloat(trx.nominal_dp) || 0) : 0);
+                totalMasuk += masuk;
+                pemasukanBulanIni.push({
+                    tgl_dibuat: tgl,
+                    no_nota: trx.no_nota,
+                    nama_klien: trx.nama_klien,
+                    status: trx.status,
+                    nominal: masuk
+                });
+            }
+        });
+
+        // Filter pengeluaran berdasarkan bulan
+        let pengeluaranBulanIni = [];
+        let totalKeluar = 0;
+
+        (pengeluaran || []).forEach(el => {
+            let tgl = el.tanggal || '';
+            if (tgl.startsWith(bulanParam)) {
+                let keluar = parseFloat(el.nominal) || 0;
+                totalKeluar += keluar;
+                pengeluaranBulanIni.push({
+                    id: el.id,
+                    tanggal: el.tanggal,
+                    kategori: el.kategori,
+                    keterangan: el.keterangan,
+                    nominal: keluar
+                });
+            }
+        });
+
+        res.json({
+            status: 'success',
+            data: {
+                pemasukan: pemasukanBulanIni,
+                pengeluaran: pengeluaranBulanIni,
+                total_masuk: totalMasuk,
+                total_keluar: totalKeluar
+            }
+        });
+    } catch (e) {
+        res.status(500).json({ status: 'error', message: e.message });
+    }
+});
+
+
 // ==========================================
 // FALLBACK & SERVER LISTENER (All Pages Router)
 // ==========================================
